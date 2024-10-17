@@ -1,62 +1,11 @@
 //
-//  BitsDecoder.swift
+//  Data Shifting.swift
 //  swift-FLAC
 //
 //  Created by Vaida on 10/18/24.
 //
 
 import Foundation
-
-
-internal struct BitsDecoder {
-    
-    let data: Data
-    
-    var bitIndex: Int
-    
-    
-    init(_ data: consuming Data) {
-        self.data = data
-        self.bitIndex = 0
-    }
-    
-//    mutating func read(bitsCount: Int) -> Data? {
-//        let lowerBound = bitIndex
-//        self.bitIndex += bitsCount
-//        guard bitIndex <= data.count * 8 else { return nil }
-//        
-//        return data[lowerBound ..< bitIndex]
-//    }
-    
-    mutating func readInteger(bitsCount: Int) -> Int? {
-        let (index, offset) = bitIndex.quotientAndRemainder(dividingBy: 8)
-        self.bitIndex += bitsCount
-        guard bitIndex <= data.count * 8 else { return nil }
-        
-        let (endIndex, endOffset) = bitIndex.quotientAndRemainder(dividingBy: 8)
-        let buffer = data[index ..< endIndex + (endOffset == 0 ? 0 : 1)]
-        
-        return nil
-    }
-    
-    
-    static func decodeInteger(_ buffer: Data) -> Int {
-        precondition(buffer.count < 8, "Integer too large")
-        
-        var result: Int = 0
-        for (_, element) in buffer.enumerated() {
-            if result == 0 {
-                // do not shift
-            } else {
-                result <<= 8
-            }
-            result |= Int(element)
-        }
-        
-        return result
-    }
-    
-}
 
 
 extension Data {
@@ -141,20 +90,6 @@ extension Data {
     public static func >>= (lhs: inout Data, rhs: Int) {
         guard rhs.signum() != -1 else { lhs <<= abs(rhs); return }
         
-//        let _result = Int(rhs).quotientAndRemainder(dividingBy: UInt8.bitWidth)
-//        let _highShift = _result.quotient
-//        
-//        lhs.removeLast(_highShift)
-//        
-//        let lowOffset = _result.remainder
-//        let highOffset = UInt8.bitWidth &- lowOffset
-//        
-//        guard _result.remainder != 0 else { return } // all good!
-//        
-//        for i in stride(from: lhs.count-1, to: 0, by: -1) {
-//            lhs[i] = lhs[i&-1] << highOffset | lhs[i] >> lowOffset
-//        }
-        
         var (removed, lowOffset) = rhs.quotientAndRemainder(dividingBy: UInt8.bitWidth)
         let highOffset = UInt8.bitWidth &- lowOffset
         
@@ -183,3 +118,4 @@ extension Data {
     }
     
 }
+
