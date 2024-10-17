@@ -5,17 +5,28 @@ import PackageDescription
 
 let package = Package(
     name: "swift-FLAC",
+    platforms: [
+        .macOS(.v11)
+    ],
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "swift-FLAC",
-            targets: ["swift-FLAC"]),
+            name: "swiftFLAC",
+            targets: ["swiftFLAC"]
+        ),
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "swift-FLAC"),
-
+            name: "swiftFLAC",
+            path: "swift-FLAC"
+        ),
+        .executableTarget(
+            name: "Client",
+            path: "Client"
+        ),
+        .testTarget(
+            name: "Tests",
+            dependencies: ["swiftFLAC"],
+            path: "Tests"
+        )
     ]
 )
