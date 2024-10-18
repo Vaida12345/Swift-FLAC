@@ -17,24 +17,20 @@ extension FLACContainer.Metadata {
     public struct SeekTableBlock: CustomDetailedStringConvertible {
         
         /// Seek points within a table must be sorted in ascending order by sample number.
-        let points: [SeekPoint]
+        public let points: [SeekPoint]
         
-        public init?(data: Data) {
+        init(data: Data) throws {
             var handler = BitsDecoder(data)
             
-            do {
-                let count = data.count / 18
-                var points: [SeekPoint] = []
-                points.reserveCapacity(count)
-                
-                for _ in 1...count {
-                    try points.append(SeekPoint(handler: &handler))
-                }
-                
-                self.points = points
-            } catch {
-                return nil
+            let count = data.count / 18
+            var points: [SeekPoint] = []
+            points.reserveCapacity(count)
+            
+            for _ in 1...count {
+                try points.append(SeekPoint(handler: &handler))
             }
+            
+            self.points = points
         }
         
         public func detailedDescription(using descriptor: DetailedDescription.Descriptor<FLACContainer.Metadata.SeekTableBlock>) -> any DescriptionBlockProtocol {
@@ -47,13 +43,13 @@ extension FLACContainer.Metadata {
         public struct SeekPoint: CustomDetailedStringConvertible {
             
             /// Sample number of first sample in the target frame
-            let sampleNumber: Int
+            public let sampleNumber: Int
             
             /// Offset (in bytes) from the first byte of the first frame header to the first byte of the target frame's header.
-            let offset: Int
+            public let offset: Int
             
             /// Number of samples in the target frame.
-            let length: Int
+            public let length: Int
             
             
             init(handler: inout BitsDecoder) throws {

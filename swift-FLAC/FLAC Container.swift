@@ -34,9 +34,15 @@ public struct FLACContainer: CustomDetailedStringConvertible {
         }
         
         guard rawMetadata.count > 0,
-              rawMetadata[0].blockType == .streamInfo,
-              let streamInfo = Metadata.StreamInfoBlock(data: rawMetadata[0].data) else {
-            throw DecodeError.missingStreamInfo
+              rawMetadata[0].blockType == .streamInfo else {
+            throw DecodeError.missingStreamInfo(NSError())
+        }
+        
+        let streamInfo: Metadata.StreamInfoBlock
+        do {
+            streamInfo = try Metadata.StreamInfoBlock(data: rawMetadata[0].data)
+        } catch {
+            throw DecodeError.missingStreamInfo(error)
         }
         
         var metadata = Metadata(streamInfo: streamInfo)
@@ -44,15 +50,23 @@ public struct FLACContainer: CustomDetailedStringConvertible {
         for raw in rawMetadata[1...] {
             switch raw.blockType {
             case .application:
-                guard let block = Metadata.ApplicationBlock(data: raw.data) else { throw DecodeError.cannotDecodeApplication }
-                metadata.application.append(block)
+                do {
+                    let block = try Metadata.ApplicationBlock(data: raw.data)
+                    metadata.application.append(block)
+                } catch {
+                    throw DecodeError.cannotDecodeApplication(error)
+                }
                 
             case .seekTable:
-                guard let block = Metadata.SeekTableBlock(data: raw.data) else { throw DecodeError.cannotDecodeSeekTable }
                 if metadata.seekTable != nil {
                     throw DecodeError.duplicatedSeekTable
                 } else {
-                    metadata.seekTable = block
+                    do {
+                        let block = try Metadata.SeekTableBlock(data: raw.data)
+                        metadata.seekTable = block
+                    } catch {
+                        throw DecodeError.cannotDecodeSeekTable(error)
+                    }
                 }
                 
             case .vorbisComment:
@@ -65,6 +79,26 @@ public struct FLACContainer: CustomDetailedStringConvertible {
                     } catch {
                         throw DecodeError.cannotDecodeVorbisComment(error)
                     }
+                }
+                
+            case .cueSheet:
+                if metadata.cueSheet != nil {
+                    throw DecodeError.duplicatedCueSheet
+                } else {
+                    do {
+                        let block = try Metadata.CueSheetBlock(data: raw.data)
+                        metadata.cueSheet = block
+                    } catch {
+                        throw DecodeError.cannotDecodeCueSheet(error)
+                    }
+                }
+                
+            case .picture:
+                do {
+                    let block = try Metadata.PictureBlock(data: raw.data)
+                    metadata.pictures.append(block)
+                } catch {
+                    throw DecodeError.cannotDecodePicture(error)
                 }
                 
             default:
@@ -83,12 +117,15 @@ public struct FLACContainer: CustomDetailedStringConvertible {
     
     public enum DecodeError: Error {
         case notFLAC
-        case missingStreamInfo
-        case cannotDecodeApplication
-        case cannotDecodeSeekTable
+        case missingStreamInfo(Error)
+        case cannotDecodeApplication(Error)
+        case cannotDecodeSeekTable(Error)
         case duplicatedSeekTable
         case cannotDecodeVorbisComment(Error)
         case duplicatedVorbisComment
+        case cannotDecodeCueSheet(Error)
+        case duplicatedCueSheet
+        case cannotDecodePicture(Error)
     }
     
 }

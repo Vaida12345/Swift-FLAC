@@ -24,8 +24,12 @@ extension FLACContainer {
         
         public internal(set) var vorbisComment: VorbisCommentBlock? = nil
         
+        public internal(set) var cueSheet: CueSheetBlock? = nil
         
-        public init(streamInfo: StreamInfoBlock) {
+        public internal(set) var pictures: [PictureBlock] = []
+        
+        
+        init(streamInfo: StreamInfoBlock) {
             self.streamInfo = streamInfo
         }
         
@@ -35,6 +39,8 @@ extension FLACContainer {
                 descriptor.sequence(for: \.application, hideEmptySequence: true)
                 descriptor.optional(for: \.seekTable)
                 descriptor.optional(for: \.vorbisComment)
+                descriptor.optional(for: \.cueSheet)
+                descriptor.sequence(for: \.pictures, hideEmptySequence: true)
             }
         }
         

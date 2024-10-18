@@ -78,6 +78,12 @@ internal struct BitsDecoder {
         return buffer
     }
     
+    mutating func decodeString(bytesCount: Int) throws(DecodeError) -> String {
+        let data = try self.decodeData(bytesCount: bytesCount)
+        guard let string = String(data: data, encoding: .utf8) else { throw .invalidString }
+        return string
+    }
+    
     static func decodeInteger(_ buffer: Data, isBigEndian: Bool = true) -> Int {
         precondition(buffer.count <= 8, "Integer too large")
         
@@ -106,6 +112,7 @@ internal struct BitsDecoder {
     
     enum DecodeError: Error {
         case outOfBounds
+        case invalidString
     }
     
 }

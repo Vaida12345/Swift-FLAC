@@ -14,8 +14,3 @@ let url = URL(fileURLWithPath: "/Users/vaida/Music/mora/Evan Call/TVアニメ『
 
 let container = try FLACContainer(from: url)
 detailedPrint(container)
-
-
-if let comment = container.metadata.vorbisComment {
-    detailedPrint(comment)
-}

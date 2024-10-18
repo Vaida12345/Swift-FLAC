@@ -85,10 +85,10 @@ extension FLACContainer.Metadata {
         public private(set) var comment: String?
         
         /// The additional information not covered by the predefined properties.
-        let additionalInformation: [String: String]
+        public let additionalInformation: [String: String]
         
         
-        public init(data: Data) throws {
+        init(data: Data) throws {
             var handler = BytesDecoder(data)
             let vendorLength = try handler.decodeInteger(bytesCount: 32 / 8, isBigEndian: false)
             self.vendor = try handler.decodeString(bytesCount: vendorLength, encoding: .utf8)

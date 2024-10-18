@@ -32,8 +32,8 @@ extension Data {
     ///   - lhs: The value to shift.
     ///   - rhs: The number of bits to shift lhs to the left.
     public static func <<= (lhs: inout Data, rhs: Int) {
+        guard rhs != 0 else { return }
         guard rhs.signum() != -1 else { lhs >>= abs(rhs); return }
-        
         
         var (removed, highOffset) = rhs.quotientAndRemainder(dividingBy: UInt8.bitWidth)
         let lowOffset = UInt8.bitWidth &- highOffset
@@ -88,6 +88,7 @@ extension Data {
     ///   - lhs: The value to shift.
     ///   - rhs: The number of bits to shift lhs to the right.
     public static func >>= (lhs: inout Data, rhs: Int) {
+        guard rhs != 0 else { return }
         guard rhs.signum() != -1 else { lhs <<= abs(rhs); return }
         
         var (removed, lowOffset) = rhs.quotientAndRemainder(dividingBy: UInt8.bitWidth)
