@@ -45,7 +45,7 @@ internal struct BitsDecoder {
         
         let (endIndex, endOffset) = bitIndex.quotientAndRemainder(dividingBy: 8)
         assert(endIndex + (endOffset == 0 ? 0 : 1) <= data.count)
-        var buffer = data[index ..< endIndex + (endOffset == 0 ? 0 : 1)]
+        var buffer = data[data.startIndex + index ... data.startIndex + endIndex + (endOffset == 0 ? -1 : 0)]
         
         buffer <<= offset
         
@@ -72,7 +72,7 @@ internal struct BitsDecoder {
         guard bitIndex <= data.count * 8 else { throw .outOfBounds }
         
         let (endIndex, endOffset) = bitIndex.quotientAndRemainder(dividingBy: 8)
-        var buffer = data[index ..< endIndex + (endOffset == 0 ? 0 : 1)]
+        var buffer = data[data.startIndex + index ..< data.startIndex + endIndex + (endOffset == 0 ? 0 : 1)]
         
         buffer <<= offset
         

@@ -16,7 +16,7 @@ public struct FLACContainer: CustomDetailedStringConvertible {
     
     public let metadata: Metadata
     
-    public let frame: Frame
+    public let frames: [Frame]
     
     
     public init(at url: URL) throws {
@@ -106,6 +106,9 @@ public struct FLACContainer: CustomDetailedStringConvertible {
                     throw DecodeError.cannotDecodePicture(error)
                 }
                 
+            case .padding:
+                continue
+                
             default:
                 metadata.rawFields.append(raw)
             }
@@ -114,12 +117,18 @@ public struct FLACContainer: CustomDetailedStringConvertible {
         self.metadata = metadata
         
         var handler = BitsDecoder(consume handle)
-        self.frame = try Frame(handler: &handler)
+        
+        var frames: [Frame] = []
+        while handler.bitIndex < handler.data.count * 8 {
+            try frames.append(Frame(handler: &handler, streamInfo: streamInfo))
+        }
+        self.frames = frames
     }
     
     public func detailedDescription(using descriptor: DetailedDescription.Descriptor<FLACContainer>) -> any DescriptionBlockProtocol {
         descriptor.container {
             descriptor.value(for: \.metadata)
+            descriptor.sequence(for: \.frames)
         }
     }
     

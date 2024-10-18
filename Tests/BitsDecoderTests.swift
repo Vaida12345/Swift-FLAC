@@ -26,7 +26,6 @@ struct BitsDecoderTests {
     @Test
     func decodeInteger2() throws {
         let bits = Data([0b00000100, 0b10000000])
-        print(bits.binaryDigits)
         var decoder = BitsDecoder(bits)
         
         try #expect(decoder.decodeInteger(bitsCount: 16) == 128 + 1024)
