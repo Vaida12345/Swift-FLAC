@@ -20,6 +20,11 @@ internal struct BitsDecoder {
         self.bitIndex = 0
     }
     
+    init(_ decoder: consuming BytesDecoder) {
+        self.data = decoder.data
+        self.bitIndex = decoder.index * 8
+    }
+    
 //    mutating func read(bitsCount: Int) -> Data? {
 //        let lowerBound = bitIndex
 //        self.bitIndex += bitsCount
@@ -39,6 +44,7 @@ internal struct BitsDecoder {
         guard bitIndex <= data.count * 8 else { throw .outOfBounds }
         
         let (endIndex, endOffset) = bitIndex.quotientAndRemainder(dividingBy: 8)
+        assert(endIndex + (endOffset == 0 ? 0 : 1) <= data.count)
         var buffer = data[index ..< endIndex + (endOffset == 0 ? 0 : 1)]
         
         buffer <<= offset

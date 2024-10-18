@@ -17,8 +17,8 @@ extension FLACContainer.Metadata {
         public let data: Data
         
         
-        init(handle: FileHandle, metaDataIsLast: inout Bool) throws {
-            guard let headerData = try handle.read(upToCount: 1)?[0] else { throw CorruptionError.invalidLastMetadataBlockFlagData }
+        init(handler: inout BytesDecoder, metaDataIsLast: inout Bool) throws {
+            let headerData = try handler.decodeNext()
             
             switch headerData >> 7 {
             case 1:
@@ -38,10 +38,8 @@ extension FLACContainer.Metadata {
                 self.blockType = .init(rawValue: blockType)
             }
             
-            guard let lengthData = try handle.read(upToCount: 3) else { throw CorruptionError.invalidLengthData }
-            
-            let length = BitsDecoder.decodeInteger(lengthData)
-            guard let data = try handle.read(upToCount: length) else { throw CorruptionError.invalidPayload }
+            let length = try handler.decodeInteger(bytesCount: 3)
+            let data = try handler.decodeData(bytesCount: length)
             self.data = data
         }
         

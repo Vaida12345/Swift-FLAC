@@ -16,20 +16,25 @@ public struct FLACContainer: CustomDetailedStringConvertible {
     
     public let metadata: Metadata
     
+    public let frame: Frame
     
-    public init(from source: URL) throws {
+    
+    public init(at url: URL) throws {
+        let data = try Data(contentsOf: url)
+        try self.init(data: data)
+    }
+    
+    public init(data: Data) throws {
+        var handle = BytesDecoder(consume data)
         
-        let handle = try FileHandle(forReadingFrom: source)
-        
-        guard let nextData = try handle.read(upToCount: 4),
-              String(data: nextData, encoding: .ascii) == "fLaC" else { throw DecodeError.notFLAC }
+        guard try handle.decodeString(bytesCount: 4, encoding: .ascii) == "fLaC" else { throw DecodeError.notFLAC }
         
         
         var isLastMetadata = false
         var rawMetadata: [Metadata.RawMetadata] = []
         
         while !isLastMetadata {
-            let new = try Metadata.RawMetadata(handle: handle, metaDataIsLast: &isLastMetadata)
+            let new = try Metadata.RawMetadata(handler: &handle, metaDataIsLast: &isLastMetadata)
             rawMetadata.append(new)
         }
         
@@ -102,11 +107,14 @@ public struct FLACContainer: CustomDetailedStringConvertible {
                 }
                 
             default:
-                continue
+                metadata.rawFields.append(raw)
             }
         }
         
         self.metadata = metadata
+        
+        var handler = BitsDecoder(consume handle)
+        self.frame = try Frame(handler: &handler)
     }
     
     public func detailedDescription(using descriptor: DetailedDescription.Descriptor<FLACContainer>) -> any DescriptionBlockProtocol {

@@ -23,9 +23,16 @@ internal struct BytesDecoder {
     mutating func decodeData(bytesCount: Int) throws(DecodeError) -> Data {
         let index = self.index
         self.index += bytesCount
-        guard self.index < self.data.count else { throw .outOfBounds }
+        guard self.index <= self.data.count else { throw .outOfBounds }
         
         return self.data[index..<self.index]
+    }
+    
+    mutating func decodeNext() throws(DecodeError) -> UInt8 {
+        guard self.index < self.data.count else { throw .outOfBounds }
+        defer { self.index += 1 }
+        
+        return self.data[self.index]
     }
     
     mutating func decodeString(bytesCount: Int, encoding: String.Encoding) throws(DecodeError) -> String {

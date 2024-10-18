@@ -28,6 +28,9 @@ extension FLACContainer {
         
         public internal(set) var pictures: [PictureBlock] = []
         
+        /// Unmatched raw fields.
+        public internal(set) var rawFields: [RawMetadata] = []
+        
         
         init(streamInfo: StreamInfoBlock) {
             self.streamInfo = streamInfo
@@ -41,6 +44,7 @@ extension FLACContainer {
                 descriptor.optional(for: \.vorbisComment)
                 descriptor.optional(for: \.cueSheet)
                 descriptor.sequence(for: \.pictures, hideEmptySequence: true)
+                descriptor.sequence(for: \.rawFields, hideEmptySequence: true)
             }
         }
         
