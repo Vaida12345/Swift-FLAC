@@ -93,28 +93,30 @@ extension Data {
         var (removed, lowOffset) = rhs.quotientAndRemainder(dividingBy: UInt8.bitWidth)
         let highOffset = UInt8.bitWidth &- lowOffset
         
-        while removed > 0 {
-            // remove last
-            var index = lhs.count - 1
+        lhs.withUnsafeMutableBytes { lhs in
+            while removed > 0 {
+                // remove last
+                var index = lhs.count - 1
+                while index > 0 {
+                    lhs[index] = lhs[index - 1]
+                    
+                    index &-= 1
+                }
+                lhs[0] = 0
+                
+                
+                removed &-= 1
+            }
+            
+            
+            var index = lhs.count &- 1
             while index > 0 {
-                lhs[index] = lhs[index - 1]
+                lhs[index] = lhs[index &- 1] << highOffset | lhs[index] >> lowOffset
                 
                 index &-= 1
             }
-            lhs[0] = 0
-            
-            
-            removed &-= 1
+            lhs[0] >>= lowOffset
         }
-        
-        
-        var index = lhs.count &- 1
-        while index > 0 {
-            lhs[index] = lhs[index &- 1] << highOffset | lhs[index] >> lowOffset
-            
-            index &-= 1
-        }
-        lhs[0] >>= lowOffset
     }
     
 }

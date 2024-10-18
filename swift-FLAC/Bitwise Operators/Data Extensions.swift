@@ -63,8 +63,7 @@ extension Data {
                     results.append("\(buffer[i] & pivot == pivot ? "1" : "0")")
                 }
                 
-                
-                if i == buffer.count - 2 {
+                if i != buffer.count - 1 {
                     results.append("_")
                 }
             }

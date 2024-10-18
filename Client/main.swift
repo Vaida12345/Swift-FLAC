@@ -6,8 +6,16 @@
 //
 
 import Foundation
+import SwiftFLAC
+import DetailedDescription
 
 
 let url = URL(fileURLWithPath: "/Users/vaida/Music/mora/Evan Call/TVアニメ『葬送のフリーレン』Original Soundtrack/01-Journey of a Lifetime ~ Frieren Main Theme.flac")
 
+let container = try FLACContainer(from: url)
+detailedPrint(container)
 
+
+if let comment = container.metadata.vorbisComment {
+    detailedPrint(comment)
+}

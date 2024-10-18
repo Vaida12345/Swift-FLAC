@@ -6,11 +6,15 @@
 //
 
 import Foundation
+import DetailedDescription
 
 
 extension FLACContainer.Metadata {
     
-    public struct StreamInfo: MetadataProtocol {
+    /// This block has information about the whole stream, like sample rate, number of channels, total number of samples, etc.
+    ///
+    /// It must be present as the first metadata block in the stream. Other metadata blocks may follow, and ones that the decoder doesn't understand, it will skip.
+    public struct StreamInfoBlock: CustomDetailedStringConvertible {
         
         /// The minimum block size (in samples) used in the stream.
         let minimumBlockSize: Int
@@ -42,12 +46,55 @@ extension FLACContainer.Metadata {
         
         /// FLAC specifies a minimum block size of 16 and a maximum block size of 65535, meaning the bit patterns corresponding to the numbers 0-15 in the minimum blocksize and maximum blocksize fields are invalid.
         public init?(data: Data) {
-            guard data.count == 252 else { return nil }
+//            guard data.count == 252 else { return nil }
             var handler = BitsDecoder(data)
             
-            
-            return nil 
+            do {
+                let minimumBlockSize = try handler.decodeInteger(bitsCount: 16)
+                guard minimumBlockSize >= 16 && minimumBlockSize <= 65535 else { return nil }
+                self.minimumBlockSize = minimumBlockSize
+                
+                let maximumBlockSize = try handler.decodeInteger(bitsCount: 16)
+                guard maximumBlockSize >= 16 && maximumBlockSize <= 65535 else { return nil }
+                self.maximumBlockSize = maximumBlockSize
+                
+                self.minimumFrameSize = try handler.decodeInteger(bitsCount: 24)
+                self.maximumFrameSize = try handler.decodeInteger(bitsCount: 24)
+                
+                self.sampleRate = try handler.decodeInteger(bitsCount: 20)
+                
+                self.channelsCount = try handler.decodeInteger(bitsCount: 3)
+                
+                self.bitsPerSample = try handler.decodeInteger(bitsCount: 5)
+                
+                self.samplesCount = try handler.decodeInteger(bitsCount: 36)
+                
+                self.md5Signature = try handler.decodeData(bytesCount: 128 / 8)
+                
+            } catch {
+                return nil
+            }
         }
+        
+        public func detailedDescription(using descriptor: DetailedDescription.Descriptor<FLACContainer.Metadata.StreamInfoBlock>) -> any DescriptionBlockProtocol {
+            descriptor.container {
+                if minimumBlockSize == maximumBlockSize {
+                    descriptor.value("blockSize", of: minimumBlockSize)
+                } else {
+                    descriptor.value(for: \.minimumBlockSize)
+                    descriptor.value(for: \.maximumBlockSize)
+                }
+                
+                descriptor.value(for: \.minimumFrameSize)
+                descriptor.value(for: \.maximumFrameSize)
+                
+                descriptor.value(for: \.sampleRate)
+                descriptor.value(for: \.channelsCount)
+                descriptor.value(for: \.bitsPerSample)
+                descriptor.value(for: \.samplesCount)
+            }
+        }
+        
     }
     
 }

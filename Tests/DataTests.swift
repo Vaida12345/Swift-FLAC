@@ -8,7 +8,7 @@
 import Testing
 import Foundation
 @testable
-import swiftFLAC
+import SwiftFLAC
 
 
 @Suite

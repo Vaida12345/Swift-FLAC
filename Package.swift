@@ -4,28 +4,33 @@
 import PackageDescription
 
 let package = Package(
-    name: "swift-FLAC",
+    name: "Swift-FLAC",
     platforms: [
         .macOS(.v11)
     ],
     products: [
         .library(
-            name: "swiftFLAC",
-            targets: ["swiftFLAC"]
+            name: "SwiftFLAC",
+            targets: ["SwiftFLAC"]
         ),
+    ],
+    dependencies: [
+        .package(url: "https://github.com/Vaida12345/DetailedDescription.git", branch: "main")
     ],
     targets: [
         .target(
-            name: "swiftFLAC",
-            path: "swift-FLAC"
+            name: "SwiftFLAC",
+            dependencies: ["DetailedDescription"],
+            path: "Swift-FLAC"
         ),
         .executableTarget(
             name: "Client",
+            dependencies: ["SwiftFLAC", "DetailedDescription"],
             path: "Client"
         ),
         .testTarget(
             name: "Tests",
-            dependencies: ["swiftFLAC"],
+            dependencies: ["SwiftFLAC"],
             path: "Tests"
         )
     ]

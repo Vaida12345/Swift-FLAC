@@ -1,78 +1,43 @@
 //
-//  Metadata Decode.swift
+//  Metadata.swift
 //  swift-FLAC
 //
-//  Created by Vaida on 10/17/24.
+//  Created by Vaida on 10/18/24.
 //
 
 import Foundation
+import DetailedDescription
 
 
 extension FLACContainer {
     
-    public struct Metadata {
+    /// A collection of flac metadata.
+    ///
+    /// - Note: Paddings are not decoded.
+    public struct Metadata: CustomDetailedStringConvertible {
         
-        public let blockType: BlockType?
+        public let streamInfo: StreamInfoBlock
         
-        public let data: Data
+        public internal(set) var application: [ApplicationBlock] = []
+        
+        public internal(set) var seekTable: SeekTableBlock? = nil
+        
+        public internal(set) var vorbisComment: VorbisCommentBlock? = nil
         
         
-        init(handle: FileHandle, metaDataIsLast: inout Bool) throws {
-            guard let headerData = try handle.read(upToCount: 1)?[0] else { throw CorruptionError.invalidLastMetadataBlockFlagData }
-            
-            switch headerData >> 7 {
-            case 1:
-                metaDataIsLast = true
-            case 0:
-                metaDataIsLast = false
-            default:
-                fatalError()
+        public init(streamInfo: StreamInfoBlock) {
+            self.streamInfo = streamInfo
+        }
+        
+        public func detailedDescription(using descriptor: DetailedDescription.Descriptor<FLACContainer.Metadata>) -> any DescriptionBlockProtocol {
+            descriptor.container {
+                descriptor.value(for: \.streamInfo)
+                descriptor.sequence(for: \.application, hideEmptySequence: true)
+                descriptor.optional(for: \.seekTable)
+                descriptor.optional(for: \.vorbisComment)
             }
-            
-            let blockType = headerData & 0b0111_1111
-            switch blockType {
-            case 127:
-                throw CorruptionError.invalidBlockType
-                
-            default:
-                self.blockType = .init(rawValue: blockType)
-            }
-            
-            guard let lengthData = try handle.read(upToCount: 3) else { throw CorruptionError.invalidLengthData }
-            
-            let length = BitsDecoder.decodeInteger(lengthData)
-            guard let data = try handle.read(upToCount: length) else { throw CorruptionError.invalidPayload }
-            self.data = data
         }
         
-        
-        public enum CorruptionError: Error {
-            case invalidLastMetadataBlockFlagData
-            case invalidBlockType
-            case invalidLengthData
-            case invalidPayload
-        }
-        
-        public enum BlockType: UInt8 {
-            case streamInfo = 0
-            case padding
-            case application
-            case seekTable
-            case vorbisComment
-            case cueSheet
-            case picture
-        }
-        
-    }
-    
-}
-
-
-public extension FLACContainer.Metadata {
-    
-    /// Cast and decode the metadata.
-    func `as`<T>(_ type: T.Type) -> T? where T: MetadataProtocol {
-        T(data: self.data)
     }
     
 }
