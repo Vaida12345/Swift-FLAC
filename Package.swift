@@ -20,17 +20,26 @@ let package = Package(
     targets: [
         .target(
             name: "SwiftFLAC",
-            dependencies: ["DetailedDescription"],
+            dependencies: ["DetailedDescription", "BitwiseOperators"],
             path: "Swift-FLAC"
+        ),
+        .target(
+            name: "SwiftAIFF",
+            dependencies: ["DetailedDescription", "BitwiseOperators"],
+            path: "Swift-AIFF"
+        ),
+        .target(
+            name: "BitwiseOperators",
+            path: "Bitwise Operators"
         ),
         .executableTarget(
             name: "Client",
-            dependencies: ["SwiftFLAC", "DetailedDescription"],
+            dependencies: ["SwiftFLAC", "DetailedDescription", "SwiftAIFF"],
             path: "Client"
         ),
         .testTarget(
             name: "Tests",
-            dependencies: ["SwiftFLAC"],
+            dependencies: ["SwiftFLAC", "SwiftAIFF", "BitwiseOperators"],
             path: "Tests"
         )
     ]

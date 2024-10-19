@@ -8,19 +8,19 @@
 import Foundation
 
 
-internal struct BitsDecoder {
+public struct BitsDecoder {
     
-    let data: Data
+    public let data: Data
     
-    var bitIndex: Int
+    public var bitIndex: Int
     
     
-    init(_ data: consuming Data) {
+    public init(_ data: consuming Data) {
         self.data = data
         self.bitIndex = 0
     }
     
-    init(_ decoder: consuming BytesDecoder) {
+    public init(_ decoder: consuming BytesDecoder) {
         self.data = decoder.data
         self.bitIndex = decoder.index * 8
     }
@@ -34,11 +34,11 @@ internal struct BitsDecoder {
 //    }
     
     /// Seek to given bit index.
-    mutating func seek(to offset: Int) {
+    public mutating func seek(to offset: Int) {
         self.bitIndex = offset
     }
     
-    mutating func decodeInteger(bitsCount: Int) throws(DecodeError) -> Int {
+    public mutating func decodeInteger(bitsCount: Int) throws(DecodeError) -> Int {
         let (index, offset) = bitIndex.quotientAndRemainder(dividingBy: 8)
         self.bitIndex += bitsCount
         guard bitIndex <= data.count * 8 else { throw .outOfBounds }
@@ -52,12 +52,32 @@ internal struct BitsDecoder {
         // now align right
         if endOffset != 0 {
             buffer >>= (UInt8.bitWidth - endOffset) + offset
+        } else {
+            buffer >>= offset
         }
         
         return BitsDecoder.decodeInteger(buffer)
     }
     
-    mutating func decodeBool() throws(DecodeError) -> Bool {
+    
+//    public mutating func
+//    
+//    /// Decode as the specified type.
+//    ///
+//    /// When type is signed, necessary measures were made to ensure the return value still represents the encoded value.
+//    ///
+//    /// - precondition: `bitesCount` \< `type.bitWidth`
+//    public mutating func decode<T>(bitesCount: Int, as type: T.Type) -> T where T: FixedWidthInteger {
+//        precondition(bitesCount < type.bitWidth)
+//        
+//        if type.isSigned {
+//            
+//        } else {
+//            
+//        }
+//    }
+    
+    public mutating func decodeBool() throws(DecodeError) -> Bool {
         self.bitIndex += 1
         guard bitIndex <= data.count * 8 else { throw .outOfBounds }
         
@@ -66,7 +86,7 @@ internal struct BitsDecoder {
         return data[index] & (1 << (UInt8.bitWidth - offset)) != 0
     }
     
-    mutating func decodeData(bytesCount: Int) throws(DecodeError) -> Data {
+    public mutating func decodeData(bytesCount: Int) throws(DecodeError) -> Data {
         let (index, offset) = bitIndex.quotientAndRemainder(dividingBy: 8)
         self.bitIndex += bytesCount * 8
         guard bitIndex <= data.count * 8 else { throw .outOfBounds }
@@ -84,13 +104,13 @@ internal struct BitsDecoder {
         return buffer
     }
     
-    mutating func decodeString(bytesCount: Int) throws(DecodeError) -> String {
+    public mutating func decodeString(bytesCount: Int) throws(DecodeError) -> String {
         let data = try self.decodeData(bytesCount: bytesCount)
         guard let string = String(data: data, encoding: .utf8) else { throw .invalidString }
         return string
     }
     
-    static func decodeInteger(_ buffer: Data, isBigEndian: Bool = true) -> Int {
+    public static func decodeInteger(_ buffer: Data, isBigEndian: Bool = true) -> Int {
         precondition(buffer.count <= 8, "Integer too large")
         
         if isBigEndian {
@@ -116,7 +136,7 @@ internal struct BitsDecoder {
     }
     
     
-    enum DecodeError: Error {
+    public enum DecodeError: Error {
         case outOfBounds
         case invalidString
     }

@@ -7,6 +7,7 @@
 
 import Foundation
 import DetailedDescription
+import BitwiseOperators
 
 
 extension FLACContainer {
@@ -26,7 +27,11 @@ extension FLACContainer {
             let header = try Header(handler: &handler, streamInfo: streamInfo)
             self.header = header
             let channelCount = self.header.channelAssignment.channelCount
-            self.subframes = try (0..<channelCount).map({ _ in try Subframe(handler: &handler, header: header) })
+            self.subframes = try (0..<channelCount).map { _ in
+                let frame = try Subframe(handler: &handler, header: header)
+                detailedPrint(frame)
+                return frame
+            }
             
             if !handler.bitIndex.isMultiple(of: 8) {
                 guard try handler.decodeInteger(bitsCount: 8 - handler.bitIndex % 8) == 0 else {

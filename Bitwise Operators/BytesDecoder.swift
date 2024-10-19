@@ -8,19 +8,19 @@
 import Foundation
 
 
-internal struct BytesDecoder {
+public struct BytesDecoder {
     
-    let data: Data
+    public let data: Data
     
-    var index: Int
+    public var index: Int
     
     
-    init(_ data: Data) {
+    public init(_ data: Data) {
         self.data = data
         self.index = 0
     }
     
-    mutating func decodeData(bytesCount: Int) throws(DecodeError) -> Data {
+    public mutating func decodeData(bytesCount: Int) throws(DecodeError) -> Data {
         let index = self.index
         self.index += bytesCount
         guard self.index <= self.data.count else { throw .outOfBounds }
@@ -28,25 +28,35 @@ internal struct BytesDecoder {
         return self.data[data.startIndex + index..<data.startIndex + self.index]
     }
     
-    mutating func decodeNext() throws(DecodeError) -> UInt8 {
+    public mutating func decodeNext() throws(DecodeError) -> UInt8 {
         guard self.index < self.data.count else { throw .outOfBounds }
         defer { self.index += 1 }
         
         return self.data[self.index]
     }
     
-    mutating func decodeString(bytesCount: Int, encoding: String.Encoding) throws(DecodeError) -> String {
+    public mutating func decodeString(bytesCount: Int, encoding: String.Encoding) throws(DecodeError) -> String {
         let data = try self.decodeData(bytesCount: bytesCount)
         guard let string = String(data: data, encoding: encoding) else { throw .invalidString }
         return string
     }
     
-    mutating func decodeInteger(bytesCount: Int, isBigEndian: Bool = true) throws(DecodeError) -> Int {
+    public mutating func decodeInteger(bytesCount: Int, isBigEndian: Bool = true) throws(DecodeError) -> Int {
         let data = try self.decodeData(bytesCount: bytesCount)
         return BitsDecoder.decodeInteger(data, isBigEndian: isBigEndian)
     }
     
-    enum DecodeError: Error {
+    public mutating func decode<T>(_ type: T.Type = T.self, isBigEndian: Bool = true) throws(DecodeError) -> T where T: BinaryInteger & FixedWidthInteger {
+        let buffer = try self.decodeData(bytesCount: T.bitWidth / 8)
+        
+        if isBigEndian {
+            return T(data: Data(buffer.reversed()))
+        } else {
+            return T(data: buffer)
+        }
+    }
+    
+    public enum DecodeError: Error {
         case outOfBounds
         case invalidString
     }

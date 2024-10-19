@@ -7,6 +7,7 @@
 
 import Foundation
 import DetailedDescription
+import BitwiseOperators
 
 
 /// A container for FLAC.

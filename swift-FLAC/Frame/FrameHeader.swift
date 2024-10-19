@@ -7,6 +7,7 @@
 
 import Foundation
 import DetailedDescription
+import BitwiseOperators
 
 
 extension FLACContainer.Frame {
@@ -47,9 +48,9 @@ extension FLACContainer.Frame {
             case 0b0001:
                 self.blockSize = 192
             case 0b0010...0b0101:
-                self.blockSize = 576 * pow(2, rawSize - 2)
+                self.blockSize = 576 << (rawSize - 2)
             case 0b1000...0b1111:
-                self.blockSize = 256 * pow(2, rawSize - 8)
+                self.blockSize = 256 << (rawSize - 8)
             default:
                 fatalError()
             }
@@ -198,7 +199,7 @@ extension FLACContainer.Frame {
             /// mid/side stereo: channel 0 is the mid(average) channel, channel 1 is the side(difference) channel
             case midSideStereo
             
-            var channelCount: Int {
+            public var channelCount: Int {
                 switch self {
                 case let .channels(count):
                     return count
@@ -213,16 +214,16 @@ extension FLACContainer.Frame {
 }
 
 
-internal func pow(_ a: Int, _ b: Int) -> Int {
-    var a = a
+func pow(_ a: Int, _ b: Int) -> Int {
+    var result = a
     var index = 1
     while index < b {
-        a *= a
+        result *= a
         
         index &+= 1
     }
     
-    return a
+    return result
 }
 
 

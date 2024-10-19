@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import BitwiseOperators
 
 
 extension FLACContainer.Metadata {
