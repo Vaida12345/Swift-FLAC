@@ -34,10 +34,9 @@ extension FLACContainer.Frame {
         
         
         init(handler: inout BitsDecoder, streamInfo: FLACContainer.Metadata.StreamInfoBlock) throws {
-            guard try handler.decode(bitsCount: 14, as: UInt16.self) == 0b11111111111110 else {
+            guard try handler.decode(bitsCount: 15, as: UInt16.self) == 0b111111111111100 else {
                 throw DecodeError.invalidSyncCode
             }
-            let _ = try handler.decodeBool()
             let isVariableBlockSize = try handler.decodeBool()
             
             let rawSize = try handler.decodeInt(encoding: .unsigned(bits: 4))

@@ -15,7 +15,7 @@ extension FLACContainer.Frame.Subframe.Payload {
     public struct Fixed: CustomDetailedStringConvertible {
         
         /// Unencoded warm-up samples
-        public let data: Data
+        public let warmupSamples: [Int]
         
         public let residual: Residual
         
@@ -27,13 +27,15 @@ extension FLACContainer.Frame.Subframe.Payload {
             predicatorOrder: Int
         ) throws {
             assert(header.bitsPerSample * predicatorOrder % 8 == 0)
-            self.data = try handler.decodeData(bytesCount: header.bitsPerSample * predicatorOrder / 8)
+            self.warmupSamples = try (0..<predicatorOrder).map { _ in
+                try handler.decodeInt(encoding: .signed(bits: header.bitsPerSample))
+            }
             self.residual = try Residual(handler: &handler, header: header, subheader: subheader, predicatorOrder: predicatorOrder)
         }
         
         public func detailedDescription(using descriptor: DetailedDescription.Descriptor<FLACContainer.Frame.Subframe.Payload.Fixed>) -> any DescriptionBlockProtocol {
             descriptor.container {
-                descriptor.value(for: \.data)
+                descriptor.value(for: \.warmupSamples)
                 descriptor.value(for: \.residual)
             }
         }

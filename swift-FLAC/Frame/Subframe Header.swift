@@ -45,11 +45,13 @@ extension FLACContainer.Frame.Subframe {
                 }
             }
             
-            if try handler.decodeBool() {
-                self.wastedBitsPerSample = try handler.decodeInt(encoding: .unary)
+            if try handler.decodeBool() == true {
+                self.wastedBitsPerSample = try handler.decodeInt(encoding: .unary) + 1
             } else {
                 self.wastedBitsPerSample = 0
             }
+            
+            print(self)
         }
         
         public func detailedDescription(using descriptor: DetailedDescription.Descriptor<FLACContainer.Frame.Subframe.Header>) -> any DescriptionBlockProtocol {

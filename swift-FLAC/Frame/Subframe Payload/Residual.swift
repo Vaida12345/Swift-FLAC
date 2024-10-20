@@ -28,7 +28,8 @@ extension FLACContainer.Frame.Subframe.Payload {
             let encodingMethod = try handler.decode(bitsCount: 2, as: UInt8.self)
             let partitionOrder = try handler.decodeInt(encoding: .unsigned(bits: 4))
             self.partitionOrder = partitionOrder
-            self.partitions = try (0..<(1 >> partitionOrder)).map {
+            
+            self.partitions = try (0..<(1 << partitionOrder)).map {
                 try Partition(
                     handler: &handler,
                     header: header,
@@ -39,22 +40,22 @@ extension FLACContainer.Frame.Subframe.Payload {
                     encodingMethod: encodingMethod
                 )
             }
+            
         }
         
         public func detailedDescription(using descriptor: DetailedDescription.Descriptor<FLACContainer.Frame.Subframe.Payload.Residual>) -> any DescriptionBlockProtocol {
             descriptor.container {
                 descriptor.value(for: \.partitionOrder)
                 descriptor.value(for: \.partitions)
+//                descriptor.constant("partitions: <\(partitions.count) elements>")
             }
         }
         
         
-        public enum Partition {
+        public enum Partition: CustomDetailedStringConvertible {
             
             /// The residual samples, which are signed numbers, are represented by unsigned numbers in the Rice code. For positive numbers, the representation is the number doubled, for negative numbers, the representation is the number multiplied by -2 and has 1 subtracted.
-            case rice(parameters: Int)
-            /// The residual samples, which are signed numbers, are represented by unsigned numbers in the Rice code. For positive numbers, the representation is the number doubled, for negative numbers, the representation is the number multiplied by -2 and has 1 subtracted.
-            case rice2(parameters: Int)
+            case encoded(version: Version, content: [Int])
             /// the partition is in unencoded binary form using n bits per sample
             ///
             /// the Rice coding is not used for this partition. Instead, the residual data is stored unencoded using a fixed number of bits per sample
@@ -62,51 +63,104 @@ extension FLACContainer.Frame.Subframe.Payload {
             /// The residual samples themselves are stored signed two's complement.
             ///
             /// Note that it is possible that the number of bits with which each sample is stored is 0, which means all residual samples in that partition have a value of 0 and that no bits are used to store the samples. In that case, the partition contains nothing except the escape code and `0b00000`.
-            case unencoded(residual: Data, bitsPerSample: Int, samplesCount: Int)
+            case unencoded(residual: [Int], bitsPerSample: Int)
+            
+            case empty
             
             
             init(handler: inout BitsDecoder, header: FLACContainer.Frame.Header, subheader: FLACContainer.Frame.Subframe.Header, partitionOrder: Int, predicatorOrder: Int, isFirst: Bool, encodingMethod: UInt8) throws {
+                var version: Version? = nil
+                var parameter: Int
+                
                 switch encodingMethod {
                 case 0b00:
-                    let parameter = try handler.decodeInt(encoding: .signed(bits: 4))
+                    parameter = try handler.decodeInt(encoding: .unsigned(bits: 4))
                     if parameter != 0b1111 {
-                        self = .rice(parameters: parameter)
-                        return
+                        version = .rice
                     }
                     
                 case 0b01:
-                    let parameter = try handler.decodeInt(encoding: .signed(bits: 5))
+                    parameter = try handler.decodeInt(encoding: .unsigned(bits: 5))
                     if parameter != 0b11111 {
-                        self = .rice2(parameters: parameter)
-                        return
+                        version = .rice2
                     }
                     
                 default:
                     throw DecodeError.reservedResidualCodingMethod
                 }
                 
-                let bitsPerSample = try handler.decodeInt(encoding: .signed(bits: 5))
                 let numberOfSamples = if !isFirst {
                     header.blockSize >> partitionOrder // blockSize / 2 ** partitionOrder
                 } else {
-                    header.blockSize >> partitionOrder - predicatorOrder
+                    (header.blockSize >> partitionOrder) - predicatorOrder
                 }
                 
+                guard numberOfSamples > 0 else {
+                    self = .empty
+                    return
+                }
                 
-                guard numberOfSamples > 0 else { throw DecodeError.invalidResidualLength }
-                let length = bitsPerSample * numberOfSamples
-                assert(length % 8 == 0)
-                self = try .unencoded(
-                    residual: handler.decodeData(bytesCount: length / 8),
-                    bitsPerSample: bitsPerSample,
-                    samplesCount: numberOfSamples
-                )
+                if let version {
+                    let elements = try (0..<numberOfSamples).map { _ in
+                        let quotient = try handler.decodeInt(encoding: .unary)
+                        let remainder = try handler.decodeInt(encoding: .unsigned(bits: parameter))
+                        
+                        let folded = (quotient << parameter) | remainder
+                        if folded.isMultiple(of: 2) {
+                            return folded >> 1
+                        } else {
+                            return ~(folded >> 1)
+                        }
+                    }
+                    
+                    self = .encoded(version: version, content: elements)
+                } else {
+                    let bitsPerSample = try handler.decodeInt(encoding: .signed(bits: 5))
+                    
+                    if bitsPerSample == 0 {
+                        self = .unencoded(
+                            residual: [Int](repeating: 0, count: numberOfSamples),
+                            bitsPerSample: bitsPerSample
+                        )
+                    } else {
+                        let residual = try (0..<numberOfSamples).map { _ in
+                            try handler.decodeInt(encoding: .signed(bits: bitsPerSample))
+                        }
+                        
+                        self = .unencoded(
+                            residual: residual,
+                            bitsPerSample: bitsPerSample
+                        )
+                    }
+                }
+            }
+            
+            public func detailedDescription(using descriptor: DetailedDescription.Descriptor<FLACContainer.Frame.Subframe.Payload.Residual.Partition>) -> any DescriptionBlockProtocol {
+                switch self {
+                case let .encoded(version, content):
+                    descriptor.container("encoded") {
+                        descriptor.value("version", of: version)
+                        descriptor.constant("content: <Array \(content.count) elements>")
+                    }
+                case let .unencoded(residual, bitsPerSample):
+                    descriptor.container("unencoded") {
+                        descriptor.constant("residual: <Array \(residual.count) elements>")
+                        descriptor.value("bitsPerSample", of: bitsPerSample)
+                    }
+                case .empty:
+                    descriptor.constant("empty")
+                }
             }
             
             
             public enum DecodeError: Error {
                 case reservedResidualCodingMethod
                 case invalidResidualLength
+            }
+            
+            public enum Version {
+                case rice
+                case rice2
             }
         }
         

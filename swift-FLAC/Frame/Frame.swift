@@ -25,6 +25,8 @@ extension FLACContainer {
         
         init(handler: inout BitsDecoder, streamInfo: FLACContainer.Metadata.StreamInfoBlock) throws {
             let header = try Header(handler: &handler, streamInfo: streamInfo)
+            detailedPrint(header)
+            
             self.header = header
             let channelCount = self.header.channelAssignment.channelCount
             self.subframes = try (0..<channelCount).map { _ in
@@ -34,7 +36,9 @@ extension FLACContainer {
             }
             
             if !handler.bitIndex.isMultiple(of: 8) {
-                guard try handler.decodeInt(encoding: .unsigned(bits: 8 - handler.bitIndex % 8)) == 0 else {
+                let paddings = try handler.decodeInt(encoding: .unsigned(bits: 8 - handler.bitIndex % 8))
+                print(paddings.bigEndian.data.binaryDigits)
+                guard paddings == 0 else {
                     throw DecodeError.invalidPadding
                 }
             }

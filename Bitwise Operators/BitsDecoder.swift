@@ -67,6 +67,8 @@ public struct BitsDecoder {
     ///
     /// - Returns: Only the trailing `bitsCount` bits are relevant. The leading `data.count * 8 - bitsCount` bits are wasted, and filled with zeros.
     public mutating func decodePartialData(bitsCount: Int) throws(DecodeError) -> Data {
+        guard bitsCount != 0 else { return Data() }
+        
         let (index, offset) = bitIndex.quotientAndRemainder(dividingBy: 8)
         self.bitIndex += bitsCount
         guard bitIndex <= data.count * 8 else { throw .outOfBounds }
@@ -163,7 +165,7 @@ public struct BitsDecoder {
         
         if buffer.count > bytesCount {
             assert(buffer.count == bytesCount + 1)
-            return buffer[0..<buffer.count + buffer.startIndex - 1]
+            return buffer[buffer.startIndex ..< buffer.endIndex - 1]
         } else {
             return buffer
         }
@@ -174,6 +176,7 @@ public struct BitsDecoder {
         guard let string = String(data: data, encoding: encoding) else { throw .invalidString }
         return string
     }
+    
     
     public static func decodeInteger(_ buffer: Data, endianness: Endianness = .bigEndian) -> Int {
         precondition(buffer.count <= 8, "Integer too large")
