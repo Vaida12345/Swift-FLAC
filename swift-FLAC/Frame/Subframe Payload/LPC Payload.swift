@@ -19,11 +19,11 @@ extension FLACContainer.Frame.Subframe.Payload {
         /// Quantized linear predictor coefficients' precision in bits
         public let linearPredictorCoefficientsPrecisions: Int
         
-        /// Quantized linear predictor coefficient shift needed in bits (NOTE: this number is signed two's-complement).
-        public let linearPredictorCoefficientsShift: UInt
+        /// Quantized linear predictor coefficient shift needed in bits.
+        public let linearPredictorCoefficientsShift: Int
         
-        /// Unencoded predictor coefficients (NOTE: the coefficients are signed two's-complement).
-        public let linearPredictorCoefficients: UInt
+        /// Unencoded predictor coefficients.
+        public let linearPredictorCoefficients: Int
         
         public let residual: Residual
         
@@ -37,15 +37,15 @@ extension FLACContainer.Frame.Subframe.Payload {
             assert(header.bitsPerSample * order % 8 == 0)
             self.unencodedWarmupSamples = try handler.decodeData(bytesCount: header.bitsPerSample * order / 8)
             
-            let linearPredictorCoefficientsPrecisions = try handler.decodeInteger(bitsCount: 4)
+            let linearPredictorCoefficientsPrecisions = try handler.decodeInt(encoding: .unsigned(bits: 4))
             if linearPredictorCoefficientsPrecisions != 0b1111 {
                 self.linearPredictorCoefficientsPrecisions = linearPredictorCoefficientsPrecisions + 1
             } else {
                 throw DecodeError.invalidLinearPredictorCoefficientsPrecisions
             }
             
-            self.linearPredictorCoefficientsShift = try UInt(handler.decodeInteger(bitsCount: 5))
-            self.linearPredictorCoefficients = try UInt(handler.decodeInteger(bitsCount: linearPredictorCoefficientsPrecisions * order))
+            self.linearPredictorCoefficientsShift = try handler.decodeInt(encoding: .signed(bits: 5))
+            self.linearPredictorCoefficients = try handler.decodeInt(encoding: .signed(bits: linearPredictorCoefficientsPrecisions * order))
             
             self.residual = try Residual(handler: &handler, header: header, subheader: subheader, predicatorOrder: order)
         }

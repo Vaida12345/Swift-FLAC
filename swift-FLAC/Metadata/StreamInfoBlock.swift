@@ -49,24 +49,24 @@ extension FLACContainer.Metadata {
         init(data: Data) throws {
             var handler = BitsDecoder(data)
             
-            let minimumBlockSize = try handler.decodeInteger(bitsCount: 16)
+            let minimumBlockSize = try handler.decodeInt(encoding: .unsigned(bits: 16))
             guard minimumBlockSize >= 16 && minimumBlockSize <= 65535 else { throw DecodeError.invalidBlockSize }
             self.minimumBlockSize = minimumBlockSize
             
-            let maximumBlockSize = try handler.decodeInteger(bitsCount: 16)
+            let maximumBlockSize = try handler.decodeInt(encoding: .unsigned(bits: 16))
             guard maximumBlockSize >= 16 && maximumBlockSize <= 65535 else { throw DecodeError.invalidBlockSize }
             self.maximumBlockSize = maximumBlockSize
             
-            self.minimumFrameSize = try handler.decodeInteger(bitsCount: 24)
-            self.maximumFrameSize = try handler.decodeInteger(bitsCount: 24)
+            self.minimumFrameSize = try handler.decodeInt(encoding: .unsigned(bits: 24))
+            self.maximumFrameSize = try handler.decodeInt(encoding: .unsigned(bits: 24))
             
-            self.sampleRate = try handler.decodeInteger(bitsCount: 20)
+            self.sampleRate = try handler.decodeInt(encoding: .unsigned(bits: 20))
             
-            self.channelsCount = try handler.decodeInteger(bitsCount: 3)
+            self.channelsCount = try handler.decodeInt(encoding: .unsigned(bits: 3))
             
-            self.bitsPerSample = try handler.decodeInteger(bitsCount: 5)
+            self.bitsPerSample = try handler.decodeInt(encoding: .unsigned(bits: 5))
             
-            self.samplesCount = try handler.decodeInteger(bitsCount: 36)
+            self.samplesCount = try handler.decodeInt(encoding: .unsigned(bits: 36))
             
             self.md5Signature = try handler.decodeData(bytesCount: 128 / 8)
         }

@@ -20,7 +20,7 @@ extension FLACContainer {
         public let subframes: [Subframe]
         
         /// CRC-16 (polynomial = x^16 + x^15 + x^2 + x^0, initialized with 0) of everything before the crc, back to and including the frame header sync code
-        public let checksum: Int
+        public let checksum: UInt16
         
         
         init(handler: inout BitsDecoder, streamInfo: FLACContainer.Metadata.StreamInfoBlock) throws {
@@ -34,13 +34,13 @@ extension FLACContainer {
             }
             
             if !handler.bitIndex.isMultiple(of: 8) {
-                guard try handler.decodeInteger(bitsCount: 8 - handler.bitIndex % 8) == 0 else {
+                guard try handler.decodeInt(encoding: .unsigned(bits: 8 - handler.bitIndex % 8)) == 0 else {
                     throw DecodeError.invalidPadding
                 }
             }
             assert(handler.bitIndex.isMultiple(of: 8))
             
-            self.checksum = try handler.decodeInteger(bitsCount: 16)
+            self.checksum = try handler.decode(bitsCount: 16, as: UInt16.self)
         }
         
         

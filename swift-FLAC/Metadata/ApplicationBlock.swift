@@ -19,7 +19,7 @@ extension FLACContainer.Metadata {
     public struct ApplicationBlock {
         
         /// Registered application ID. (Visit the [registration page](https://xiph.org/flac/id.html) to register an ID with FLAC.)
-        let id: Int
+        let id: UInt32
         
         /// Application data (n must be a multiple of 8)
         let data: Data
@@ -27,7 +27,7 @@ extension FLACContainer.Metadata {
         init(data: Data) throws {
             var handler = BitsDecoder(data)
             
-            self.id = try handler.decodeInteger(bitsCount: 32)
+            self.id = try handler.decode(bitsCount: 32)
             self.data = handler.data[(handler.bitIndex / 8)...]
         }
         

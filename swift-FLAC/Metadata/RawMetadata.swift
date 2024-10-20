@@ -18,19 +18,10 @@ extension FLACContainer.Metadata {
         public let data: Data
         
         
-        init(handler: inout BytesDecoder, metaDataIsLast: inout Bool) throws {
-            let headerData = try handler.decodeNext()
+        init(handler: inout BitsDecoder, metaDataIsLast: inout Bool) throws {
+            metaDataIsLast = try handler.decodeBool()
             
-            switch headerData >> 7 {
-            case 1:
-                metaDataIsLast = true
-            case 0:
-                metaDataIsLast = false
-            default:
-                fatalError()
-            }
-            
-            let blockType = headerData & 0b0111_1111
+            let blockType = try handler.decode(bitsCount: 7, as: UInt8.self)
             switch blockType {
             case 127:
                 throw CorruptionError.invalidBlockType
@@ -39,7 +30,7 @@ extension FLACContainer.Metadata {
                 self.blockType = .init(rawValue: blockType)
             }
             
-            let length = try handler.decodeInteger(bytesCount: 3)
+            let length = try handler.decodeInt(encoding: .unsigned(bits: 24))
             let data = try handler.decodeData(bytesCount: length)
             self.data = data
         }

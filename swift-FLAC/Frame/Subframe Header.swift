@@ -22,7 +22,7 @@ extension FLACContainer.Frame.Subframe {
         init(handler: inout BitsDecoder) throws {
             guard try handler.decodeBool() == false else { throw DecodeError.missingPadding }
             
-            let rawType = try handler.decodeInteger(bitsCount: 6)
+            let rawType = try handler.decodeInt(encoding: .unsigned(bits: 6))
             switch rawType {
             case 0b000000: self.type = .constant
             case 0b000001: self.type = .verbatim
@@ -46,9 +46,7 @@ extension FLACContainer.Frame.Subframe {
             }
             
             if try handler.decodeBool() {
-                var i = 0
-                while try handler.decodeBool() == false { i += 1 }
-                self.wastedBitsPerSample = i
+                self.wastedBitsPerSample = try handler.decodeInt(encoding: .unary)
             } else {
                 self.wastedBitsPerSample = 0
             }

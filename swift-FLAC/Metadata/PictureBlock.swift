@@ -45,23 +45,23 @@ extension FLACContainer.Metadata {
         init(data: Data) throws {
             var handler = BitsDecoder(data)
             
-            guard let pictureType = try PictureType(rawValue: UInt32(handler.decodeInteger(bitsCount: 32))) else {
+            guard let pictureType = try PictureType(rawValue: handler.decode(bitsCount: 32)) else {
                 throw DecodeError.invalidPictureType
             }
             self.pictureType = pictureType
             
-            let MIMELength = try handler.decodeInteger(bitsCount: 32)
-            self.MIMEType = try handler.decodeString(bytesCount: MIMELength)
+            let MIMELength = try handler.decodeInt(encoding: .unsigned(bits: 32))
+            self.MIMEType = try handler.decodeString(bytesCount: MIMELength, encoding: .ascii)
             
-            let descriptionLength = try handler.decodeInteger(bitsCount: 32)
-            self.description = try handler.decodeString(bytesCount: descriptionLength)
+            let descriptionLength = try handler.decodeInt(encoding: .unsigned(bits: 32))
+            self.description = try handler.decodeString(bytesCount: descriptionLength, encoding: .utf8)
             
-            self.width = try handler.decodeInteger(bitsCount: 32)
-            self.height = try handler.decodeInteger(bitsCount: 32)
-            self.colorDepth = try handler.decodeInteger(bitsCount: 32)
-            self.colorsUsedCount = try handler.decodeInteger(bitsCount: 32)
+            self.width = try handler.decodeInt(encoding: .unsigned(bits: 32))
+            self.height = try handler.decodeInt(encoding: .unsigned(bits: 32))
+            self.colorDepth = try handler.decodeInt(encoding: .unsigned(bits: 32))
+            self.colorsUsedCount = try handler.decodeInt(encoding: .unsigned(bits: 32))
             
-            let dataLength = try handler.decodeInteger(bitsCount: 32)
+            let dataLength = try handler.decodeInt(encoding: .unsigned(bits: 32))
             self.data = try handler.decodeData(bytesCount: dataLength)
         }
         

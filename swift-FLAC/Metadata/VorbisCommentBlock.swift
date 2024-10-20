@@ -90,16 +90,16 @@ extension FLACContainer.Metadata {
         
         
         init(data: Data) throws {
-            var handler = BytesDecoder(data)
-            let vendorLength = try handler.decodeInteger(bytesCount: 32 / 8, isBigEndian: false)
+            var handler = BitsDecoder(data)
+            let vendorLength = try handler.decodeInt(encoding: .unsigned(bits: 32, endianness: .littleEndian))
             self.vendor = try handler.decodeString(bytesCount: vendorLength, encoding: .utf8)
             
             
             var additionalInformation: [String: String] = [:]
             
-            let userCommentListLength = try handler.decodeInteger(bytesCount: 32 / 8, isBigEndian: false)
+            let userCommentListLength = try handler.decodeInt(encoding: .unsigned(bits: 32, endianness: .littleEndian))
             for _ in 1...userCommentListLength {
-                let length = try handler.decodeInteger(bytesCount: 32 / 8, isBigEndian: false)
+                let length = try handler.decodeInt(encoding: .unsigned(bits: 32, endianness: .littleEndian))
                 guard let content = try? handler.decodeString(bytesCount: length, encoding: .utf8) else { continue }
                 
                 guard let separator = content.firstIndex(of: "=") else { continue }

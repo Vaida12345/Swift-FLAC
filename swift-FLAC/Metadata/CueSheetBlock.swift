@@ -38,14 +38,14 @@ extension FLACContainer.Metadata {
         init(data: Data) throws {
             var handler = BitsDecoder(data)
             
-            self.mediaCatalogNumber = try handler.decodeString(bytesCount: 128)
-            self.leadInSamplesCount = try handler.decodeInteger(bitsCount: 64)
+            self.mediaCatalogNumber = try handler.decodeString(bytesCount: 128, encoding: .ascii)
+            self.leadInSamplesCount = try handler.decodeInt(encoding: .unsigned(bits: 64))
             self.isCompactDisc = try handler.decodeBool()
             
             // reserved space
             handler.bitIndex += 7 + 258 * 8
             
-            let tracksCount = try handler.decodeInteger(bitsCount: 8)
+            let tracksCount = try handler.decodeInt(encoding: .unsigned(bits: 8))
             
             var tracks: [Track] = []
             tracks.reserveCapacity(tracksCount)
@@ -84,16 +84,16 @@ extension FLACContainer.Metadata {
             
             
             init(handler: inout BitsDecoder) throws {
-                self.offset = try handler.decodeInteger(bitsCount: 64)
-                self.trackNumber = try handler.decodeInteger(bitsCount: 8)
-                self.ISRC = try handler.decodeString(bytesCount: 12)
+                self.offset = try handler.decodeInt(encoding: .unsigned(bits: 64))
+                self.trackNumber = try handler.decodeInt(encoding: .unsigned(bits: 8))
+                self.ISRC = try handler.decodeString(bytesCount: 12, encoding: .ascii)
                 self.trackIsAudio = try handler.decodeBool()
                 self.isPreEmphasis = try handler.decodeBool()
                 
                 // reserved space
                 handler.bitIndex += 6 + 13 * 8
                 
-                let trackIndexPointsCount = try handler.decodeInteger(bitsCount: 8)
+                let trackIndexPointsCount = try handler.decodeInt(encoding: .unsigned(bits: 8))
                 
                 var indexPoints: [IndexPoint] = []
                 indexPoints.reserveCapacity(trackIndexPointsCount)
@@ -118,8 +118,8 @@ extension FLACContainer.Metadata {
                 
                 
                 init(handler: inout BitsDecoder) throws {
-                    self.offset = try handler.decodeInteger(bitsCount: 64)
-                    self.indexPointNumber = try handler.decodeInteger(bitsCount: 8)
+                    self.offset = try handler.decodeInt(encoding: .unsigned(bits: 64))
+                    self.indexPointNumber = try handler.decodeInt(encoding: .unsigned(bits: 8))
                     
                     // reserved space
                     handler.bitIndex += 3 * 8

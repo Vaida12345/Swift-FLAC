@@ -26,16 +26,15 @@ public struct FLACContainer: CustomDetailedStringConvertible {
     }
     
     public init(data: Data) throws {
-        var handle = BytesDecoder(consume data)
+        var handler = BitsDecoder(consume data)
         
-        guard try handle.decodeString(bytesCount: 4, encoding: .ascii) == "fLaC" else { throw DecodeError.notFLAC }
-        
+        guard try handler.decodeString(bytesCount: 4, encoding: .ascii) == "fLaC" else { throw DecodeError.notFLAC }
         
         var isLastMetadata = false
         var rawMetadata: [Metadata.RawMetadata] = []
         
         while !isLastMetadata {
-            let new = try Metadata.RawMetadata(handler: &handle, metaDataIsLast: &isLastMetadata)
+            let new = try Metadata.RawMetadata(handler: &handler, metaDataIsLast: &isLastMetadata)
             rawMetadata.append(new)
         }
         
@@ -116,8 +115,6 @@ public struct FLACContainer: CustomDetailedStringConvertible {
         }
         
         self.metadata = metadata
-        
-        var handler = BitsDecoder(consume handle)
         
         var frames: [Frame] = []
         while handler.bitIndex < handler.data.count * 8 {

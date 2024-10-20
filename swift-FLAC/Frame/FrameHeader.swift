@@ -34,14 +34,13 @@ extension FLACContainer.Frame {
         
         
         init(handler: inout BitsDecoder, streamInfo: FLACContainer.Metadata.StreamInfoBlock) throws {
-            guard try handler.decodeInteger(bitsCount: 14) == 0b11111111111110 else {
-                // [255, 248...251]
+            guard try handler.decode(bitsCount: 14, as: UInt16.self) == 0b11111111111110 else {
                 throw DecodeError.invalidSyncCode
             }
             let _ = try handler.decodeBool()
             let isVariableBlockSize = try handler.decodeBool()
             
-            let rawSize = try handler.decodeInteger(bitsCount: 4)
+            let rawSize = try handler.decodeInt(encoding: .unsigned(bits: 4))
             switch rawSize {
             case 0b0000:
                 throw DecodeError.reservedBlockSize
@@ -55,7 +54,7 @@ extension FLACContainer.Frame {
                 fatalError()
             }
             
-            let rawSampleRate = try handler.decodeInteger(bitsCount: 4)
+            let rawSampleRate = try handler.decode(bitsCount: 4, as: UInt8.self)
             switch rawSampleRate {
             case 0b0000:
                 self.sampleRate = streamInfo.sampleRate
@@ -87,7 +86,7 @@ extension FLACContainer.Frame {
                 break
             }
             
-            let rawChannelCount = try handler.decodeInteger(bitsCount: 4)
+            let rawChannelCount = try handler.decodeInt(encoding: .unsigned(bits: 4))
             switch rawChannelCount {
             case 0b0000...0b0111:
                 self.channelAssignment = .channels(count: rawChannelCount + 1)
@@ -101,7 +100,7 @@ extension FLACContainer.Frame {
                 throw DecodeError.reservedChannelAssignment
             }
             
-            let rawSampleSize = try handler.decodeInteger(bitsCount: 3)
+            let rawSampleSize = try handler.decode(bitsCount: 3, as: UInt8.self)
             self.bitsPerSample = switch rawSampleSize {
             case 0b000: streamInfo.bitsPerSample
             case 0b001: 8
@@ -116,11 +115,7 @@ extension FLACContainer.Frame {
             
             let _ = try handler.decodeBool()
             
-            let utf8head = try UInt8(handler.decodeInteger(bitsCount: 8))
-            guard let utf8length = UTF8.width(startsWith: utf8head) else { throw DecodeError.blockSizeEncodingIsNotUTF8 }
-            var utf8Total = try Array(handler.decodeData(bytesCount: utf8length - 1))
-            utf8Total.insert(utf8head, at: 0)
-            let utf8Number = BitsDecoder.decodeInteger(Data(utf8Total))
+            let utf8Number = try handler.decodeInt(encoding: .utf8)
             
             if isVariableBlockSize {
                 self.blockStrategy = .variableBlockSize(sampleNumber: utf8Number)
@@ -131,10 +126,10 @@ extension FLACContainer.Frame {
             switch rawSize {
             case 0b0110:
                 // get 8 bit (blocksize-1) from end of header
-                self.blockSize = try handler.decodeInteger(bitsCount: 8)
+                self.blockSize = try handler.decodeInt(encoding: .unsigned(bits: 8))
             case 0b0111:
                 // 0111 : get 16 bit (blocksize-1) from end of header
-                self.blockSize = try handler.decodeInteger(bitsCount: 16)
+                self.blockSize = try handler.decodeInt(encoding: .unsigned(bits: 16))
             default:
                 break
             }
@@ -142,13 +137,13 @@ extension FLACContainer.Frame {
             switch rawSampleRate {
             case 0b1100:
                 // 1100 : get 8 bit sample rate (in kHz) from end of header
-                self.sampleRate = try handler.decodeInteger(bitsCount: 8) * 1000
+                self.sampleRate = try handler.decodeInt(encoding: .unsigned(bits: 8)) * 1000
             case 0b1101:
                 // 1101 : get 16 bit sample rate (in Hz) from end of header
-                self.sampleRate = try handler.decodeInteger(bitsCount: 16)
+                self.sampleRate = try handler.decodeInt(encoding: .unsigned(bits: 16))
             case 0b1110:
                 // 1110 : get 16 bit sample rate (in tens of Hz) from end of header
-                self.sampleRate = try handler.decodeInteger(bitsCount: 16) * 10
+                self.sampleRate = try handler.decodeInt(encoding: .unsigned(bits: 16)) * 10
             default:
                 break
             }
@@ -209,41 +204,6 @@ extension FLACContainer.Frame {
             }
         }
         
-    }
-    
-}
-
-
-func pow(_ a: Int, _ b: Int) -> Int {
-    var result = a
-    var index = 1
-    while index < b {
-        result *= a
-        
-        index &+= 1
-    }
-    
-    return result
-}
-
-
-extension Unicode.UTF8 {
-    
-    /// Returns `nil` if it is not a start byte, otherwise returns the byte length of the character.
-    static func width(startsWith byte: Unicode.UTF8.CodeUnit) -> Int? {
-        guard byte & 0b1100_0000 != 0b1000_0000 else { return nil } // lead, starts with 10
-        
-        if (byte & 0b1000_0000) == 0b0000_0000 { // same as isASCII, starts with 0
-            return 1
-        } else if (byte & 0b1110_0000) == 0b1100_0000 { // starts with 110
-            return 2
-        } else if (byte & 0b1111_0000) == 0b1110_0000 { // starts with 1110
-            return 3
-        } else if (byte & 0b1111_1000) == 0b1111_0000 { // starts with 11110
-            return 4
-        }
-        
-        fatalError()
     }
     
 }

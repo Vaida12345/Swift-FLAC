@@ -41,15 +41,19 @@ public struct BytesDecoder {
         return string
     }
     
-    public mutating func decodeInteger(bytesCount: Int, isBigEndian: Bool = true) throws(DecodeError) -> Int {
+    public mutating func decodeInteger(
+        bytesCount: Int,
+        endianness: BitsDecoder.Endianness = .bigEndian
+    ) throws(DecodeError) -> Int {
         let data = try self.decodeData(bytesCount: bytesCount)
-        return BitsDecoder.decodeInteger(data, isBigEndian: isBigEndian)
+        return BitsDecoder.decodeInteger(data, endianness: endianness)
     }
     
-    public mutating func decode<T>(_ type: T.Type = T.self, isBigEndian: Bool = true) throws(DecodeError) -> T where T: BinaryInteger & FixedWidthInteger {
+    /// Decodes an integer in little-endian platform.
+    public mutating func decode<T>(_ type: T.Type = T.self, endianness: BitsDecoder.Endianness = .bigEndian) throws(DecodeError) -> T where T: BinaryInteger & FixedWidthInteger {
         let buffer = try self.decodeData(bytesCount: T.bitWidth / 8)
         
-        if isBigEndian {
+        if endianness == .bigEndian {
             return T(data: Data(buffer.reversed()))
         } else {
             return T(data: buffer)

@@ -54,9 +54,9 @@ extension FLACContainer.Metadata {
             
             
             init(handler: inout BitsDecoder) throws {
-                self.sampleNumber = try handler.decodeInteger(bitsCount: 64)
-                self.offset = try handler.decodeInteger(bitsCount: 64)
-                self.length = try handler.decodeInteger(bitsCount: 16)
+                self.sampleNumber = try handler.decodeInt(encoding: .unsigned(bits: 64))
+                self.offset = try handler.decodeInt(encoding: .unsigned(bits: 64))
+                self.length = try handler.decodeInt(encoding: .unsigned(bits: 16))
             }
             
             public func detailedDescription(using descriptor: DetailedDescription.Descriptor<FLACContainer.Metadata.SeekTableBlock.SeekPoint>) -> any DescriptionBlockProtocol {

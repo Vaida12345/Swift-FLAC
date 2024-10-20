@@ -25,10 +25,10 @@ extension FLACContainer.Frame.Subframe.Payload {
         
         
         init(handler: inout BitsDecoder, header: FLACContainer.Frame.Header, subheader: FLACContainer.Frame.Subframe.Header, predicatorOrder: Int) throws {
-            let encodingMethod = try handler.decodeInteger(bitsCount: 2)
-            let partitionOrder = try handler.decodeInteger(bitsCount: 4)
+            let encodingMethod = try handler.decode(bitsCount: 2, as: UInt8.self)
+            let partitionOrder = try handler.decodeInt(encoding: .unsigned(bits: 4))
             self.partitionOrder = partitionOrder
-            self.partitions = try (0..<pow(2, partitionOrder)).map {
+            self.partitions = try (0..<(1 >> partitionOrder)).map {
                 try Partition(
                     handler: &handler,
                     header: header,
@@ -65,17 +65,17 @@ extension FLACContainer.Frame.Subframe.Payload {
             case unencoded(residual: Data, bitsPerSample: Int, samplesCount: Int)
             
             
-            init(handler: inout BitsDecoder, header: FLACContainer.Frame.Header, subheader: FLACContainer.Frame.Subframe.Header, partitionOrder: Int, predicatorOrder: Int, isFirst: Bool, encodingMethod: Int) throws {
+            init(handler: inout BitsDecoder, header: FLACContainer.Frame.Header, subheader: FLACContainer.Frame.Subframe.Header, partitionOrder: Int, predicatorOrder: Int, isFirst: Bool, encodingMethod: UInt8) throws {
                 switch encodingMethod {
                 case 0b00:
-                    let parameter = try handler.decodeInteger(bitsCount: 4)
+                    let parameter = try handler.decodeInt(encoding: .signed(bits: 4))
                     if parameter != 0b1111 {
                         self = .rice(parameters: parameter)
                         return
                     }
                     
                 case 0b01:
-                    let parameter = try handler.decodeInteger(bitsCount: 5)
+                    let parameter = try handler.decodeInt(encoding: .signed(bits: 5))
                     if parameter != 0b11111 {
                         self = .rice2(parameters: parameter)
                         return
@@ -85,7 +85,7 @@ extension FLACContainer.Frame.Subframe.Payload {
                     throw DecodeError.reservedResidualCodingMethod
                 }
                 
-                let bitsPerSample = try handler.decodeInteger(bitsCount: 5)
+                let bitsPerSample = try handler.decodeInt(encoding: .signed(bits: 5))
                 let numberOfSamples = if !isFirst {
                     header.blockSize >> partitionOrder // blockSize / 2 ** partitionOrder
                 } else {
