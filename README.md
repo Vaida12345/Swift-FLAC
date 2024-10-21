@@ -2,9 +2,10 @@
 Swift native implementation of a FLAC reader.
 
 ## Features
-- [x] Full FLAC file parsing.
+- [x] Full FLAC file & all subframe types parsing.
 - [x] Extract PCM data from verbatim-encoded (uncompressed) FLAC files.
 - [x] Convert verbatim-encoded (uncompressed) FLAC files to AIFF.
+- [ ] Understand parsed subframe contents.
 - [ ] Convert any FLAC file to AIFF.
 - [x] Optimized. 
 
