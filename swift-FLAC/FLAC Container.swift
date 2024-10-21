@@ -119,7 +119,6 @@ public struct FLACContainer: CustomDetailedStringConvertible {
         var frames: [Frame] = []
         while handler.bitIndex < handler.data.count * 8 {
             let frame = try Frame(handler: &handler, streamInfo: streamInfo, index: frames.count)
-            detailedPrint(frame)
             frames.append(frame)
         }
         self.frames = frames
