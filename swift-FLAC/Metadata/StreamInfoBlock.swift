@@ -62,9 +62,9 @@ extension FLACContainer.Metadata {
             
             self.sampleRate = try handler.decodeInt(encoding: .unsigned(bits: 20))
             
-            self.channelsCount = try handler.decodeInt(encoding: .unsigned(bits: 3))
+            self.channelsCount = try handler.decodeInt(encoding: .unsigned(bits: 3)) + 1
             
-            self.bitsPerSample = try handler.decodeInt(encoding: .unsigned(bits: 5))
+            self.bitsPerSample = try handler.decodeInt(encoding: .unsigned(bits: 5)) + 1
             
             self.samplesCount = try handler.decodeInt(encoding: .unsigned(bits: 36))
             

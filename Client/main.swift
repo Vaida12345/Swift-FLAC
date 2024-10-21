@@ -12,10 +12,17 @@ import BitwiseOperators
 import DetailedDescription
 
 
-//let url = URL(fileURLWithPath: "/Users/vaida/Music/mora/Evan Call/TVアニメ『葬送のフリーレン』Original Soundtrack/01-Journey of a Lifetime ~ Frieren Main Theme.flac")
-//
-//let container = try FLACContainer(at: url)
-////detailedPrint(container)
+let url = URL(fileURLWithPath: "/Users/vaida/Music/mora/Evan Call/TVアニメ『葬送のフリーレン』Original Soundtrack/01-Journey of a Lifetime ~ Frieren Main Theme.flac")
+
+let container = try FLACContainer(at: url)
+//detailedPrint(container)
+
+if #available(macOS 13.0, *) {
+    try container.write(to: .desktopDirectory.appending(path: "file.aiff"))
+} else {
+        // Fallback on earlier versions
+}
+
 //
 //func extractData(from container: FLACContainer) -> Data {
 //    var result = Data()
@@ -46,16 +53,13 @@ import DetailedDescription
 //    return result
 //}
 
-//let data = extractData(from: container)
-//print(data[data.startIndex + 100000 ..< data.startIndex + 100100].binaryDigits)
-
 
 //let url = URL(fileURLWithPath: "/Users/vaida/Desktop/01-Journey of a Lifetime ~ Frieren Main Theme-AIFF.aiff")
 //
 //let container = try AIFFContainer(at: url)
 
 //if #available(macOS 13.0, *) {
-//    try AIFFContainer(channelsCount: 2, sampleSize: 24, sampleRate: 48000, soundData: data).write(to: .desktopDirectory.appending(path: "file.aiff"))
+//    try AIFFContainer(channelsCount: 2, sampleSize: 24, sampleRate: 48000, soundData: data))
 //} else {
 //    // Fallback on earlier versions
 //}
@@ -68,7 +72,7 @@ import DetailedDescription
 
 
 
-let url = URL(fileURLWithPath: "/Users/vaida/Desktop/heavy compress.flac")
-
-let container = try FLACContainer(at: url)
-detailedPrint(container)
+//let url = URL(fileURLWithPath: "/Users/vaida/Desktop/heavy compress.flac")
+//
+//let container = try FLACContainer(at: url)
+//detailedPrint(container)
