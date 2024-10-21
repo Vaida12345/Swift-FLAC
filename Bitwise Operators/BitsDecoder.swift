@@ -12,7 +12,7 @@ public struct BitsDecoder {
     
     public let data: Data
     
-    public var bitIndex: Int
+    public private(set) var bitIndex: Int
     
     
     public init(_ data: consuming Data) {
@@ -28,6 +28,11 @@ public struct BitsDecoder {
     /// Seek to given bit index.
     public mutating func seek(to offset: Int) {
         self.bitIndex = offset
+    }
+    
+    /// Seek by given bit offset (to the right).
+    public mutating func seek(by offset: Int) {
+        self.bitIndex += offset
     }
     
     @available(*, deprecated, renamed: "decodeInt(encoding:)", message: "Use `decodeInt(encoding:)` instead to decode properly.")
@@ -59,7 +64,37 @@ public struct BitsDecoder {
             guard let length = UTF8.width(startsWith: head) else { throw .invalidEncoding(encoding) }
             var total = try Array(self.decodeData(bytesCount: length - 1))
             total.insert(head, at: 0)
-            return BitsDecoder.decodeInteger(Data(total))
+            
+            var decoder = BitsDecoder(Data(total))
+            
+            // not all bits can be used, must transform
+            var encoder = BitsEncoder()
+            
+            let firstByteDataLength = length == 1 ? 1 : length + 1
+            
+            // first byte
+            decoder.seek(by: firstByteDataLength)
+            
+            if length != 7 {
+                // decode first byte
+                let infoLength = UInt8.bitWidth - firstByteDataLength
+                
+                let uint = try decoder.decode(bitsCount: infoLength, as: UInt8.self)
+                encoder.encode(UInt64(uint), bitWidth: infoLength)
+            }
+            
+            // decode trailing bytes
+            for _ in 1..<length {
+                decoder.seek(by: 2)
+                let uint = try decoder.decode(bitsCount: 6, as: UInt8.self)
+                encoder.encode(UInt64(uint), bitWidth: 6)
+            }
+            
+            let leftAligned = encoder.getLeftAligned()
+            
+            var resultDecoder = BitsDecoder(leftAligned.data)
+            
+            return try resultDecoder.decodeInt(encoding: .unsigned(bits: leftAligned.bitWidth))
         }
     }
     
@@ -274,6 +309,12 @@ private extension Unicode.UTF8 {
             return 3
         } else if (byte & 0b1111_1000) == 0b1111_0000 { // starts with 11110
             return 4
+        } else if (byte & 0b1111_1100) == 0b1111_1000 { // starts with 111110
+            return 5
+        } else if (byte & 0b1111_1110) == 0b1111_1100 { // starts with 1111110
+            return 6
+        } else if byte == 0b11111110 { // starts with 11111110
+            return 7
         }
         
         fatalError()

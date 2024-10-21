@@ -18,7 +18,7 @@ extension FLACContainer.Frame {
         
         public let payload: Payload
         
-        init(handler: inout BitsDecoder, header: FLACContainer.Frame.Header) throws {
+        init(handler: inout BitsDecoder, header: FLACContainer.Frame.Header, subframeIndex: Int) throws {
             let subheader = try Header(handler: &handler)
             self.header = subheader
             
@@ -27,10 +27,10 @@ extension FLACContainer.Frame {
                 self.payload = try .constant(Payload.Constant(handler: &handler, header: header, subheader: subheader))
                 
             case .fixed(let order):
-                self.payload = try .fixed(Payload.Fixed(handler: &handler, header: header, subheader: subheader, predicatorOrder: order))
+                self.payload = try .fixed(Payload.Fixed(handler: &handler, header: header, subheader: subheader, predicatorOrder: order, index: subframeIndex))
                 
             case .lpc(let order):
-                self.payload = try .lpc(Payload.LPC(handler: &handler, header: header, subheader: subheader, order: order))
+                self.payload = try .lpc(Payload.LPC(handler: &handler, header: header, subheader: subheader, order: order, index: subframeIndex))
                 
             case .verbatim:
                 self.payload = .verbatim(try Payload.Verbatim(handler: &handler, header: header, subheader: subheader))

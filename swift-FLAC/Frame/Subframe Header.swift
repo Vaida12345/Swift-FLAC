@@ -51,7 +51,7 @@ extension FLACContainer.Frame.Subframe {
                 self.wastedBitsPerSample = 0
             }
             
-            print(self)
+//            print(self)
         }
         
         public func detailedDescription(using descriptor: DetailedDescription.Descriptor<FLACContainer.Frame.Subframe.Header>) -> any DescriptionBlockProtocol {

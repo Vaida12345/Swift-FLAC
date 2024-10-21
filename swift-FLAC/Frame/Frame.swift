@@ -23,21 +23,21 @@ extension FLACContainer {
         public let checksum: UInt16
         
         
-        init(handler: inout BitsDecoder, streamInfo: FLACContainer.Metadata.StreamInfoBlock) throws {
-            let header = try Header(handler: &handler, streamInfo: streamInfo)
-            detailedPrint(header)
+        init(handler: inout BitsDecoder, streamInfo: FLACContainer.Metadata.StreamInfoBlock, index: Int) throws {
+            let header = try Header(handler: &handler, streamInfo: streamInfo, index: index)
+//            detailedPrint(header)
             
             self.header = header
             let channelCount = self.header.channelAssignment.channelCount
-            self.subframes = try (0..<channelCount).map { _ in
-                let frame = try Subframe(handler: &handler, header: header)
-                detailedPrint(frame)
+            self.subframes = try (0..<channelCount).map { i in
+                let frame = try Subframe(handler: &handler, header: header, subframeIndex: i)
+//                detailedPrint(frame)
                 return frame
             }
             
             if !handler.bitIndex.isMultiple(of: 8) {
                 let paddings = try handler.decodeInt(encoding: .unsigned(bits: 8 - handler.bitIndex % 8))
-                print(paddings.bigEndian.data.binaryDigits)
+//                print(paddings.bigEndian.data.binaryDigits)
                 guard paddings == 0 else {
                     throw DecodeError.invalidPadding
                 }

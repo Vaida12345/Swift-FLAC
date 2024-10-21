@@ -43,7 +43,7 @@ extension FLACContainer.Metadata {
             self.isCompactDisc = try handler.decodeBool()
             
             // reserved space
-            handler.bitIndex += 7 + 258 * 8
+            handler.seek(by: 7 + 258 * 8)
             
             let tracksCount = try handler.decodeInt(encoding: .unsigned(bits: 8))
             
@@ -91,7 +91,7 @@ extension FLACContainer.Metadata {
                 self.isPreEmphasis = try handler.decodeBool()
                 
                 // reserved space
-                handler.bitIndex += 6 + 13 * 8
+                handler.seek(by: 6 + 13 * 8)
                 
                 let trackIndexPointsCount = try handler.decodeInt(encoding: .unsigned(bits: 8))
                 
@@ -122,7 +122,7 @@ extension FLACContainer.Metadata {
                     self.indexPointNumber = try handler.decodeInt(encoding: .unsigned(bits: 8))
                     
                     // reserved space
-                    handler.bitIndex += 3 * 8
+                    handler.seek(by: 3 * 8)
                 }
                 
             }

@@ -33,7 +33,7 @@ extension FLACContainer.Frame {
         public let checksum: UInt8
         
         
-        init(handler: inout BitsDecoder, streamInfo: FLACContainer.Metadata.StreamInfoBlock) throws {
+        init(handler: inout BitsDecoder, streamInfo: FLACContainer.Metadata.StreamInfoBlock, index: Int) throws {
             guard try handler.decode(bitsCount: 15, as: UInt16.self) == 0b111111111111100 else {
                 throw DecodeError.invalidSyncCode
             }
@@ -120,6 +120,7 @@ extension FLACContainer.Frame {
                 self.blockStrategy = .variableBlockSize(sampleNumber: utf8Number)
             } else {
                 self.blockStrategy = .fixedBlockSize(frameNumber: utf8Number)
+                assert(index == utf8Number)
             }
             
             switch rawSize {
@@ -172,7 +173,7 @@ extension FLACContainer.Frame {
             case blockSizeEncodingIsNotUTF8
         }
         
-        public enum BlockStrategy {
+        public enum BlockStrategy: Equatable {
             /// fixed-blocksize stream; frame header encodes the frame number
             ///
             /// the frame header encodes the frame number as above, and the frame's starting sample number will be the frame number times the blocksize
@@ -183,7 +184,7 @@ extension FLACContainer.Frame {
             case variableBlockSize(sampleNumber: Int)
         }
         
-        public enum ChannelAssignment {
+        public enum ChannelAssignment: Equatable {
             /// Number of independent channels. Where defined, the channel order follows SMPTE/ITU-R recommendations
             case channels(count: Int)
             /// left/side stereo: channel 0 is the left channel, channel 1 is the side(difference) channel

@@ -46,8 +46,8 @@ extension FLACContainer.Frame.Subframe.Payload {
         public func detailedDescription(using descriptor: DetailedDescription.Descriptor<FLACContainer.Frame.Subframe.Payload.Residual>) -> any DescriptionBlockProtocol {
             descriptor.container {
                 descriptor.value(for: \.partitionOrder)
-                descriptor.value(for: \.partitions)
-//                descriptor.constant("partitions: <\(partitions.count) elements>")
+//                descriptor.value(for: \.partitions)
+                descriptor.constant("partitions: <\(partitions.count) elements>")
             }
         }
         
