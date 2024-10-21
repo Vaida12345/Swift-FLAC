@@ -25,7 +25,7 @@ detailedPrint(container.metadata)
 let data = container.interleavedAudioData()
 
 // Write the document as aiff
-container.write(to: .desktopDirectory.appending(path: "file.aiff"))
+try container.write(to: .desktopDirectory.appending(path: "file.aiff"))
 ```
 
 ## Getting Started
