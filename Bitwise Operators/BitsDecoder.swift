@@ -37,8 +37,7 @@ public struct BitsDecoder {
     
     @available(*, deprecated, renamed: "decodeInt(encoding:)", message: "Use `decodeInt(encoding:)` instead to decode properly.")
     public mutating func decodeInteger(bitsCount: Int) throws(DecodeError) -> Int {
-        let buffer = try self.decodePartialData(bitsCount: bitsCount)
-        return BitsDecoder.decodeInteger(buffer)
+        fatalError()
     }
     
     /// Decode the buffer as `Int` using the given `encoding`.
@@ -101,8 +100,8 @@ public struct BitsDecoder {
     /// Returns a data segment large enough to contain `bitsCount` bits.
     ///
     /// - Returns: Only the trailing `bitsCount` bits are relevant. The leading `data.count * 8 - bitsCount` bits are wasted, and filled with zeros.
-    public mutating func decodePartialData(bitsCount: Int) throws(DecodeError) -> Data {
-        guard bitsCount != 0 else { return Data() }
+    public mutating func decodePartialData(bitsCount: Int) throws(DecodeError) -> MutableBuffer {
+        guard bitsCount != 0 else { return MutableBuffer(data: Data()) }
         
         let (index, offset) = bitIndex.quotientAndRemainder(dividingBy: 8)
         self.bitIndex += bitsCount
@@ -110,7 +109,7 @@ public struct BitsDecoder {
         
         let (endIndex, endOffset) = bitIndex.quotientAndRemainder(dividingBy: 8)
         assert(endIndex + (endOffset == 0 ? 0 : 1) <= data.count)
-        var buffer = data[data.startIndex + index ... data.startIndex + endIndex + (endOffset == 0 ? -1 : 0)]
+        var buffer = MutableBuffer(data: data[data.startIndex + index ... data.startIndex + endIndex + (endOffset == 0 ? -1 : 0)])
         
         buffer <<= offset
         
@@ -123,7 +122,7 @@ public struct BitsDecoder {
         
         if (buffer.count > (bitsCount + 7) / 8) {
             assert(buffer.count == (bitsCount + 7) / 8 + 1)
-            return buffer[(buffer.startIndex + 1)...]
+            return buffer[1...]
         } else {
             return buffer
         }
@@ -146,13 +145,14 @@ public struct BitsDecoder {
         assert(bitsCount <= 64, "The result could overflow UInt64, which is used as intermediate storage.")
         
         let buffer = try self.decodePartialData(bitsCount: bitsCount)
+        defer { buffer.deallocate() }
         
         var uint64: UInt64 = 0
         
         switch endianness {
         case .bigEndian:
-            var index = buffer.startIndex
-            while index < buffer.endIndex {
+            var index = 0
+            while index < buffer.count {
                 let element = buffer[index]
                 uint64 <<= 8
                 uint64 |= UInt64(element)
@@ -162,7 +162,7 @@ public struct BitsDecoder {
         case .littleEndian:
             var offset = 0
             while offset < buffer.count {
-                let index = offset &+ buffer.startIndex
+                let index = offset
                 let element = buffer[index]
                 uint64 |= UInt64(element) << (8 * offset)
                 

@@ -143,7 +143,7 @@ extension FLACContainer.Frame.Subframe.Payload {
 //                        descriptor.value("content", of: content)
                         descriptor.constant("content: <Array \(content.count) elements>")
                     }
-                case let .unencoded(residual, bitsPerSample):
+                case let .unencoded(residual, _):
                     descriptor.container("unencoded") {
                         descriptor.value("residual", of: residual)
                         descriptor.constant("residual: <Array \(residual.count) elements>")
