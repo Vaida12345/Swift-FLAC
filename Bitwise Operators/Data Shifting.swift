@@ -38,28 +38,26 @@ extension Data {
         var (removed, highOffset) = rhs.quotientAndRemainder(dividingBy: UInt8.bitWidth)
         let lowOffset = UInt8.bitWidth &- highOffset
         
-        lhs.withUnsafeMutableBytes { lhs in
-            while removed > 0 {
-                // remove first
-                var index = 1
-                while index < lhs.count {
-                    lhs[index - 1] = lhs[index]
-                    
-                    index &+= 1
-                }
-                lhs[lhs.count &- 1] = 0
-                
-                removed &-= 1
-            }
-            
-            var index = 0
-            while index < lhs.count - 1 {
-                lhs[index] = lhs[index] << highOffset | lhs[index &+ 1] >> lowOffset
+        while removed > 0 {
+            // remove first
+            var index = 1
+            while index < lhs.count {
+                lhs[lhs.startIndex &+ index - 1] = lhs[lhs.startIndex &+ index]
                 
                 index &+= 1
             }
-            lhs[lhs.count &- 1] <<= highOffset
+            lhs[lhs.startIndex &+ lhs.count &- 1] = 0
+            
+            removed &-= 1
         }
+        
+        var index = 0
+        while index < lhs.count - 1 {
+            lhs[lhs.startIndex &+ index] = lhs[lhs.startIndex &+ index] << highOffset | lhs[lhs.startIndex &+ index &+ 1] >> lowOffset
+            
+            index &+= 1
+        }
+        lhs[lhs.startIndex &+ lhs.count &- 1] <<= highOffset
     }
     
     /// Returns the result of shifting a value’s binary representation the specified number of digits to the right.
@@ -94,30 +92,28 @@ extension Data {
         var (removed, lowOffset) = rhs.quotientAndRemainder(dividingBy: UInt8.bitWidth)
         let highOffset = UInt8.bitWidth &- lowOffset
         
-        lhs.withUnsafeMutableBytes { lhs in
-            while removed > 0 {
-                // remove last
-                var index = lhs.count - 1
-                while index > 0 {
-                    lhs[index] = lhs[index - 1]
-                    
-                    index &-= 1
-                }
-                lhs[0] = 0
-                
-                
-                removed &-= 1
-            }
-            
-            
-            var index = lhs.count &- 1
+        while removed > 0 {
+            // remove last
+            var index = lhs.count - 1
             while index > 0 {
-                lhs[index] = lhs[index &- 1] << highOffset | lhs[index] >> lowOffset
+                lhs[lhs.startIndex &+ index] = lhs[lhs.startIndex &+ index - 1]
                 
                 index &-= 1
             }
-            lhs[0] >>= lowOffset
+            lhs[lhs.startIndex] = 0
+            
+            
+            removed &-= 1
         }
+        
+        
+        var index = lhs.count &- 1
+        while index > 0 {
+            lhs[lhs.startIndex &+ index] = lhs[lhs.startIndex &+ index &- 1] << highOffset | lhs[lhs.startIndex &+ index] >> lowOffset
+            
+            index &-= 1
+        }
+        lhs[lhs.startIndex] >>= lowOffset
     }
     
 }

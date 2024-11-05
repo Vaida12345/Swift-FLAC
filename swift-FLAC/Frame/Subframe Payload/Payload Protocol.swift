@@ -59,13 +59,11 @@ public extension FLACContainer.Frame.Subframe.PayloadProtocol {
         while iteratorIndex < sequence.count {
             // obtain the correct bit width data
             // swift int is 64bit, flac supports up to 32bit int.
-            let data = sequence[iteratorIndex].bigEndian.data.suffix(bytesPerSample)
-            
-            data.withUnsafeBytes{ (ptr: UnsafeRawBufferPointer) in
-                ptr.withMemoryRebound(to: UInt8.self) { ptr in
+            withUnsafePointer(to: sequence[iteratorIndex].bigEndian) { pointer in
+                pointer.withMemoryRebound(to: UInt8.self, capacity: 32 / 8) { pointer in
                     var ii = 0
                     while ii < bytesPerSample {
-                        (buffer + destIndex).initialize(to: ptr[ii])
+                        (buffer + destIndex).initialize(to: pointer[ii])
                         
                         destIndex &+= 1
                         ii &+= 1

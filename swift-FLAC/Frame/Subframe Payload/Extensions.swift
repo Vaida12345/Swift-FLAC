@@ -14,7 +14,7 @@ extension Array {
     /// `array[reversed: -2]` is the second last element.
     @inlinable
     func element(at: Int) -> Element {
-        self[self.count + at]
+        self[self.count &+ at]
     }
     
 }

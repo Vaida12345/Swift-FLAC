@@ -28,12 +28,15 @@ if #available(macOS 13.0, *) {
     try container.write(to: .desktopDirectory.appending(path: "file.aiff"))
     print("write duration: \(writeDate.distance(to: Date()))")
 } else {
-        // Fallback on earlier versions
+    // Fallback on earlier versions
 }
 
 
-//let original = try AIFFContainer(at: URL(fileURLWithPath: "/Users/vaida/Desktop/original.aiff"))
-//let new = try AIFFContainer(at: URL(fileURLWithPath: "/Users/vaida/Desktop/file.aiff"))
+let original = try AIFFContainer(at: URL(fileURLWithPath: "/Users/vaida/Desktop/original.aiff"))
+let new = try AIFFContainer(at: URL(fileURLWithPath: "/Users/vaida/Desktop/file.aiff"))
+
+assert(original.sounds[0].soundData == new.sounds[0].soundData)
+
 //
 //if #available(macOS 13.0, *) {
 //    try printData(Data(original.sounds[0].soundData)[0..<10000000]).write(to: .desktopDirectory.appending(path: "original.txt"), atomically: true, encoding: .utf8)

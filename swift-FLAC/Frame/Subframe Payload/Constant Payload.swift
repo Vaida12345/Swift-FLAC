@@ -41,17 +41,13 @@ extension FLACContainer.Frame.Subframe.Payload {
             var destIndex = 0
             let bytesPerSample = header.bitsPerSample / 8
             
-            // obtain the correct bit width data
-            // swift int is 64bit, flac supports up to 32bit int.
-            let data = sample.bigEndian.data.suffix(bytesPerSample)
-            
-            data.withUnsafeBytes{ (ptr: UnsafeRawBufferPointer) in
-                ptr.withMemoryRebound(to: UInt8.self) { ptr in
+            withUnsafePointer(to: sample.bigEndian) { pointer in
+                pointer.withMemoryRebound(to: UInt8.self, capacity: 32 / 8) { pointer in
                     var iteratorIndex = 0
                     while iteratorIndex < header.blockSize {
                         var ii = 0
                         while ii < bytesPerSample {
-                            (buffer + destIndex).initialize(to: ptr[ii])
+                            (buffer + destIndex).initialize(to: pointer[ii])
                             
                             destIndex &+= 1
                             ii &+= 1
