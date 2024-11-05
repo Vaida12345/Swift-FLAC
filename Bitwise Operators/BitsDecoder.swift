@@ -140,9 +140,10 @@ public struct BitsDecoder {
     /// - precondition: `bitsCount` \< `type.bitWidth`
     ///
     /// - Returns: An endianness-independent value.
+    // heaviest call
     public mutating func decode<T>(bitsCount: Int, as type: T.Type = T.self, endianness: Endianness = .bigEndian) throws(DecodeError) -> T where T: FixedWidthInteger {
-        precondition(bitsCount <= type.bitWidth, "The result could overflow when stored in \(T.self).")
-        precondition(bitsCount <= 64, "The result could overflow UInt64, which is used as intermediate storage.")
+        assert(bitsCount <= type.bitWidth, "The result could overflow when stored in \(T.self).")
+        assert(bitsCount <= 64, "The result could overflow UInt64, which is used as intermediate storage.")
         
         let buffer = try self.decodePartialData(bitsCount: bitsCount)
         
@@ -150,13 +151,22 @@ public struct BitsDecoder {
         
         switch endianness {
         case .bigEndian:
-            for element in buffer {
+            var index = buffer.startIndex
+            while index < buffer.endIndex {
+                let element = buffer[index]
                 uint64 <<= 8
                 uint64 |= UInt64(element)
+                
+                index &+= 1
             }
         case .littleEndian:
-            for (index, element) in buffer.enumerated() {
-                uint64 |= UInt64(element) << (8 * index)
+            var offset = 0
+            while offset < buffer.count {
+                let index = offset &+ buffer.startIndex
+                let element = buffer[index]
+                uint64 |= UInt64(element) << (8 * offset)
+                
+                offset &+= 1
             }
         }
         

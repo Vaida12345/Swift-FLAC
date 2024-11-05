@@ -12,24 +12,24 @@ import BitwiseOperators
 import DetailedDescription
 
 
-//let url = URL(fileURLWithPath: "/Users/vaida/Desktop/heavy compress.flac")
-//
-//let date = Date()
-//let container = try FLACContainer(at: url)
-////detailedPrint(container)
-//if #available(macOS 10.15, *) {
-//    print("parse duration: \(date.distance(to: Date()))")
-//} else {
-//    // Fallback on earlier versions
-//}
-//
-//let writeDate = Date()
-//if #available(macOS 13.0, *) {
-//    try container.write(to: .desktopDirectory.appending(path: "file.aiff"))
-//    print("write duration: \(writeDate.distance(to: Date()))")
-//} else {
-//        // Fallback on earlier versions
-//}
+let url = URL(fileURLWithPath: "/Users/vaida/Desktop/heavy compress.flac")
+
+let date = Date()
+let container = try FLACContainer(at: url)
+//detailedPrint(container)
+if #available(macOS 10.15, *) {
+    print("parse duration: \(date.distance(to: Date()))")
+} else {
+    // Fallback on earlier versions
+}
+
+let writeDate = Date()
+if #available(macOS 13.0, *) {
+    try container.write(to: .desktopDirectory.appending(path: "file.aiff"))
+    print("write duration: \(writeDate.distance(to: Date()))")
+} else {
+        // Fallback on earlier versions
+}
 
 
 //let original = try AIFFContainer(at: URL(fileURLWithPath: "/Users/vaida/Desktop/original.aiff"))
