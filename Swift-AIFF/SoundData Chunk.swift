@@ -33,11 +33,19 @@ extension AIFFContainer {
         
         
         func write(to handle: inout FileHandle) throws {
-            try handle.write(contentsOf: chunkID.data(using: .utf8)!)
-            try handle.write(contentsOf: chunkSize.bigEndian.data)
-            try handle.write(contentsOf: offset.bigEndian.data)
-            try handle.write(contentsOf: blockSize.bigEndian.data)
-            try handle.write(contentsOf: soundData)
+            if #available(macOS 10.15.4, *) {
+                try handle.write(contentsOf: chunkID.data(using: .utf8)!)
+                try handle.write(contentsOf: chunkSize.bigEndian.data)
+                try handle.write(contentsOf: offset.bigEndian.data)
+                try handle.write(contentsOf: blockSize.bigEndian.data)
+                try handle.write(contentsOf: soundData)
+            } else {
+                handle.write(chunkID.data(using: .utf8)!)
+                handle.write(chunkSize.bigEndian.data)
+                handle.write(offset.bigEndian.data)
+                handle.write(blockSize.bigEndian.data)
+                handle.write(soundData)
+            }
         }
         
         

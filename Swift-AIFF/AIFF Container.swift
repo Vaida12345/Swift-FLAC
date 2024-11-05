@@ -72,15 +72,25 @@ public struct AIFFContainer: CustomDetailedStringConvertible {
     }
     
     public func write(to url: URL) throws {
+        if FileManager.default.fileExists(atPath: url.path) {
+            try FileManager.default.removeItem(at: url)
+        }
+        
         try Data().write(to: url)
         var handle = try FileHandle(forWritingTo: url)
         try self.write(to: &handle)
     }
     
     public func write(to handle: inout FileHandle) throws {
-        try handle.write(contentsOf: chunkID.data(using: .utf8)!)
-        try handle.write(contentsOf: chunkSize.bigEndian.data)
-        try handle.write(contentsOf: formType.data(using: .utf8)!)
+        if #available(macOS 10.15.4, *) {
+            try handle.write(contentsOf: chunkID.data(using: .utf8)!)
+            try handle.write(contentsOf: chunkSize.bigEndian.data)
+            try handle.write(contentsOf: formType.data(using: .utf8)!)
+        } else {
+            handle.write(chunkID.data(using: .utf8)!)
+            handle.write(chunkSize.bigEndian.data)
+            handle.write(formType.data(using: .utf8)!)
+        }
         
         try self.common.write(to: &handle)
         for sound in sounds {

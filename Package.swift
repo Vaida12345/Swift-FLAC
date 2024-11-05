@@ -5,9 +5,6 @@ import PackageDescription
 
 let package = Package(
     name: "Swift-FLAC",
-    platforms: [
-        .macOS(.v11)
-    ],
     products: [
         .library(
             name: "SwiftFLAC",

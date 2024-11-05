@@ -24,7 +24,7 @@ extension FLACContainer.Frame {
             
             switch subheader.type {
             case .constant:
-                self.payload = try .constant(Payload.Constant(handler: &handler, header: header, subheader: subheader))
+                self.payload = try .constant(Payload.Constant(handler: &handler, header: header, subheader: subheader, channelIndex: subframeIndex))
                 
             case .fixed(let order):
                 self.payload = try .fixed(Payload.Fixed(handler: &handler, header: header, subheader: subheader, predicatorOrder: order, index: subframeIndex))

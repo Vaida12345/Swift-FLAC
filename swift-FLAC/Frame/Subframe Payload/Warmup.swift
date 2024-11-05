@@ -21,7 +21,7 @@ extension FLACContainer.Frame.Subframe.Payload {
         }
         
         init(handler: inout BitsDecoder, header: FLACContainer.Frame.Header, index: Int, order: Int) throws {
-            let isSideChannel = (index == 1 && (header.channelAssignment == .midSideStereo || header.channelAssignment == .leftSideStereo)) || (index == 0 && header.channelAssignment == .rightSideStereo)
+            let isSideChannel = header.isSideChannel(channelIndex: index)
             self.data = try (0..<order).map { _ in
                 try handler.decodeInt(encoding: .signed(bits: header.bitsPerSample + (isSideChannel ? 1 : 0)))
             }

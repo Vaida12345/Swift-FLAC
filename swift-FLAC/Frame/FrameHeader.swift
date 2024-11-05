@@ -16,7 +16,7 @@ extension FLACContainer.Frame {
         
         public let blockStrategy: BlockStrategy
         
-        /// Block size in inter-channel samples
+        /// The number of samples in each channel.
         public private(set) var blockSize: Int
         
         public private(set) var sampleRate: Int?
@@ -88,7 +88,7 @@ extension FLACContainer.Frame {
             let rawChannelCount = try handler.decodeInt(encoding: .unsigned(bits: 4))
             switch rawChannelCount {
             case 0b0000...0b0111:
-                self.channelAssignment = .channels(count: rawChannelCount + 1)
+                self.channelAssignment = .independent(count: rawChannelCount + 1)
             case 0b1000:
                 self.channelAssignment = .leftSideStereo
             case 0b1001:
@@ -152,6 +152,11 @@ extension FLACContainer.Frame {
             self.checksum = data[data.startIndex]
         }
         
+        /// Returns whether the channel by the given index is a side channel, for adjustments.
+        internal func isSideChannel(channelIndex: Int) -> Bool {
+            (channelIndex == 1 && (self.channelAssignment == .midSideStereo || self.channelAssignment == .leftSideStereo)) || (channelIndex == 0 && self.channelAssignment == .rightSideStereo)
+        }
+        
         
         public func detailedDescription(using descriptor: DetailedDescription.Descriptor<FLACContainer.Frame.Header>) -> any DescriptionBlockProtocol {
             descriptor.container {
@@ -186,7 +191,7 @@ extension FLACContainer.Frame {
         
         public enum ChannelAssignment: Equatable {
             /// Number of independent channels. Where defined, the channel order follows SMPTE/ITU-R recommendations
-            case channels(count: Int)
+            case independent(count: Int)
             /// left/side stereo: channel 0 is the left channel, channel 1 is the side(difference) channel
             case leftSideStereo
             /// right/side stereo: channel 0 is the side(difference) channel, channel 1 is the right channel
@@ -196,7 +201,7 @@ extension FLACContainer.Frame {
             
             public var channelCount: Int {
                 switch self {
-                case let .channels(count):
+                case let .independent(count):
                     return count
                 default:
                     return 2

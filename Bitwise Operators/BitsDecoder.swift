@@ -90,7 +90,7 @@ public struct BitsDecoder {
                 encoder.encode(UInt64(uint), bitWidth: 6)
             }
             
-            let leftAligned = encoder.getLeftAligned()
+            let leftAligned = encoder.data(alignment: .left)
             
             var resultDecoder = BitsDecoder(leftAligned.data)
             

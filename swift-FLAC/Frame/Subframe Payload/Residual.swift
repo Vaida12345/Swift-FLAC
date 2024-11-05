@@ -140,12 +140,14 @@ extension FLACContainer.Frame.Subframe.Payload {
                 case let .encoded(version, content):
                     descriptor.container("encoded") {
                         descriptor.value("version", of: version)
+//                        descriptor.value("content", of: content)
                         descriptor.constant("content: <Array \(content.count) elements>")
                     }
                 case let .unencoded(residual, bitsPerSample):
                     descriptor.container("unencoded") {
+                        descriptor.value("residual", of: residual)
                         descriptor.constant("residual: <Array \(residual.count) elements>")
-                        descriptor.value("bitsPerSample", of: bitsPerSample)
+//                        descriptor.value("bitsPerSample", of: bitsPerSample)
                     }
                 case .empty:
                     descriptor.constant("empty")
@@ -162,6 +164,28 @@ extension FLACContainer.Frame.Subframe.Payload {
                 case rice
                 case rice2
             }
+        }
+        
+        
+        public func _encodedSequence(
+            header: FLACContainer.Frame.Header,
+            subheader: FLACContainer.Frame.Subframe.Header,
+            order: Int
+        ) -> [Int] {
+            let residual = self.partitions.flatMap { partition in
+                switch partition {
+                case .encoded(_, let content):
+                    return content
+                case .unencoded(let residual, _):
+                    return residual
+                case .empty:
+                    return []
+                }
+            }
+            
+            assert(residual.count == header.blockSize - order)
+            
+            return residual
         }
         
     }

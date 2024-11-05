@@ -26,30 +26,9 @@ extension FLACContainer {
             let frame = self.frames[frameIndex]
             let bytesPerSample = frame.header.bitsPerSample / 8
             let length = frame.header.blockSize * frame.header.channelAssignment.channelCount * bytesPerSample
-            let frameDataMerged = UnsafeMutableBufferPointer<UInt8>(start: buffer.baseAddress! + accumulativeWidth, count: length)
-    
-            var subframeIndex = 0
-            while subframeIndex < frame.subframes.count {
-                let subframe = frame.subframes[subframeIndex]
-                if case let .verbatim(data) = subframe.payload {
-                    data.data.withUnsafeBytes { (buffer: UnsafeRawBufferPointer) in
-                        buffer.withMemoryRebound(to: UInt8.self) { buffer in
-                            var index = 0
-                            while index < buffer.count / 3 {
-                                frameDataMerged.initializeElement(at: (index * 2 + subframeIndex) * 3, to: buffer[index * 3])
-                                frameDataMerged.initializeElement(at: (index * 2 + subframeIndex) * 3 + 1, to: buffer[index * 3 + 1])
-                                frameDataMerged.initializeElement(at: (index * 2 + subframeIndex) * 3 + 2, to: buffer[index * 3 + 2])
-                                
-                                index &+= 1
-                            }
-                        }
-                    }
-                } else {
-                    fatalError("non-verbatim subframe is currently not supported. This will be fixed in a future commit.")
-                }
-                
-                subframeIndex &+= 1
-            }
+            let frameBuffer = buffer.baseAddress! + accumulativeWidth
+            
+            frame.write(to: frameBuffer)
     
             frameIndex &+= 1
             accumulativeWidth &+= length
