@@ -1,4 +1,4 @@
-            - name: Deploy DocC To Github-Pages
+- name: Deploy DocC To Github-Pages
   # You may pin to the exact commit or the version.
   # uses: kiarashvosough1999/docC-github-pages-deploy@ab7ea8fb02596a4f2ae75e8d411396b6e07a255b
   uses: kiarashvosough1999/docC-github-pages-deploy@v1.0.0
