@@ -14,7 +14,7 @@ jobs:
        ref: ${{ github.event.pull_request.head.ref }}
 
     - name: build static site
-      uses: actions/build-docC-static-site@v1.0.2
+      uses: kiarashvosough1999/build-docC-static-site@v1.0.2
       
   build_deploy_site:
     runs-on: ubuntu-latest
