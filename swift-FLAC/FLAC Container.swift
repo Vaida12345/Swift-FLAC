@@ -25,13 +25,13 @@ public struct FLACContainer: CustomDetailedStringConvertible {
     
     
     /// Creates a document at the given url.
-    public init(at url: URL) throws {
+    public init(at url: URL, options: DecodeOptions? = nil) throws {
         let data = try Data(contentsOf: url)
-        try self.init(data: data)
+        try self.init(data: data, options: options)
     }
     
     /// Creates a document from the given data.
-    public init(data: Data) throws {
+    public init(data: Data, options: DecodeOptions? = nil) throws {
         var handler = BitsDecoder(consume data)
         
         guard try handler.decodeString(bytesCount: 4, encoding: .ascii) == "fLaC" else { throw DecodeError.notFLAC }
@@ -122,12 +122,16 @@ public struct FLACContainer: CustomDetailedStringConvertible {
         
         self.metadata = metadata
         
-        var frames: [Frame] = []
-        while handler.bitIndex < handler.data.count * 8 {
-            let frame = try Frame(handler: &handler, streamInfo: streamInfo, index: frames.count)
-            frames.append(frame)
+        if options != .decodeMetadataOnly {
+            var frames: [Frame] = []
+            while handler.bitIndex < handler.data.count * 8 {
+                let frame = try Frame(handler: &handler, streamInfo: streamInfo, index: frames.count)
+                frames.append(frame)
+            }
+            self.frames = frames
+        } else {
+            self.frames = []
         }
-        self.frames = frames
     }
     
     public func detailedDescription(using descriptor: DetailedDescription.Descriptor<FLACContainer>) -> any DescriptionBlockProtocol {
@@ -148,6 +152,10 @@ public struct FLACContainer: CustomDetailedStringConvertible {
         case cannotDecodeCueSheet(Error)
         case duplicatedCueSheet
         case cannotDecodePicture(Error)
+    }
+    
+    public enum DecodeOptions {
+        case decodeMetadataOnly
     }
     
 }
