@@ -14,7 +14,7 @@ extension FLACContainer.Metadata {
     
     /// This block is for storing various information that can be used in a cue sheet.
     ///
-    /// It supports track and index points, compatible with Red Book CD digital audio discs, as well as other CD-DA metadata such as media catalog number and track ISRCs. The CUESHEET block is especially useful for backing up CD-DA discs, but it can be used as a general purpose cueing mechanism for playback.
+    /// It supports track and index points, compatible with Red Book CD digital audio discs, as well as other CD-DA metadata such as media catalog number and track ISRCs. The ``CueSheetBlock`` is especially useful for backing up CD-DA discs, but it can be used as a general purpose cueing mechanism for playback.
     public struct CueSheetBlock {
         
         /// Media catalog number, in ASCII printable characters 0x20-0x7e.
@@ -31,7 +31,7 @@ extension FLACContainer.Metadata {
         
         /// One or more tracks.
         ///
-        /// A CUESHEET block is required to have a lead-out track; it is always the last track in the CUESHEET. For CD-DA, the lead-out track number must be 170 as specified by the Red Book, otherwise is must be 255.
+        /// A ``CueSheetBlock`` is required to have a lead-out track; it is always the last track in the ``CueSheetBlock``. For CD-DA, the lead-out track number must be 170 as specified by the Red Book, otherwise is must be 255.
         public let tracks: [Track]
         
         

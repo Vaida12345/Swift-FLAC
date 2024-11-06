@@ -12,8 +12,6 @@ import SwiftAIFF
 extension FLACContainer {
     
     /// Extract interleaved audio data.
-    ///
-    /// - Bug: Currently requires all frames to be `verbatim`.
     public func interleavedAudioData() -> Data {
         
         let length = self.metadata.streamInfo.samplesCount * self.metadata.streamInfo.channelsCount * self.metadata.streamInfo.bitsPerSample / 8

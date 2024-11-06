@@ -11,6 +11,7 @@ import BitwiseOperators
 
 extension FLACContainer.Metadata {
     
+    /// Un-decoded raw field.
     public struct RawMetadata {
         
         public let blockType: BlockType?

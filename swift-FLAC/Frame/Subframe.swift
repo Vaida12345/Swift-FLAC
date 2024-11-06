@@ -12,6 +12,7 @@ import BitwiseOperators
 
 extension FLACContainer.Frame {
     
+    /// A subframe header plus one or more encoded samples from a given channel. All subframes within a frame will contain the same number of samples.
     public struct Subframe: CustomDetailedStringConvertible {
         
         public let header: Header

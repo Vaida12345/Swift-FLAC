@@ -13,8 +13,6 @@ import BitwiseOperators
 extension FLACContainer.Metadata {
     
     /// This block has information about the whole stream, like sample rate, number of channels, total number of samples, etc.
-    ///
-    /// It must be present as the first metadata block in the stream. Other metadata blocks may follow, and ones that the decoder doesn't understand, it will skip.
     public struct StreamInfoBlock: CustomDetailedStringConvertible {
         
         /// The minimum block size (in samples) used in the stream.

@@ -14,13 +14,13 @@ extension FLACContainer.Metadata {
     
     /// This block is for storing pictures associated with the file, most commonly cover art from CDs.
     ///
-    /// There may be more than one PICTURE block in a file. The picture format is similar to the APIC frame in ID3v2. The PICTURE block has a type, MIME type, and UTF-8 description like ID3v2, and supports external linking via URL (though this is discouraged). The differences are that there is no uniqueness constraint on the description field, and the MIME type is mandatory. The FLAC PICTURE block also includes the resolution, color depth, and palette size so that the client can search for a suitable picture without having to scan them all.
+    /// The picture format is similar to the APIC frame in [ID3v2](https://id3.org/id3v2.3.0). The ``PictureBlock`` has a type, ``PictureBlock/MIMEType``, and UTF-8 description like [ID3v2](https://id3.org/id3v2.3.0), and supports external linking via URL (though this is discouraged). The differences are that there is no uniqueness constraint on the ``PictureBlock/description`` field, and the ``PictureBlock/MIMEType`` is mandatory. The ``PictureBlock`` also includes the resolution (``PictureBlock/width``, ``PictureBlock/height``), ``PictureBlock/colorDepth``, and ``PictureBlock/paletteSize`` so that the client can search for a suitable picture without having to scan them all.
     public struct PictureBlock: CustomDetailedStringConvertible {
         
         /// The picture type according to the ID3v2 APIC frame:
         public let pictureType: PictureType
         
-        /// The MIME type string, in printable ASCII characters 0x20-0x7e. The MIME type may also be --> to signify that the data part is a URL of the picture instead of the picture data itself.
+        /// The MIME type string, in printable ASCII characters 0x20-0x7e. The MIME type may also be `-->` to signify that the data part is a URL of the picture instead of the picture data itself.
         public let MIMEType: String
         
         /// The description of the picture, in UTF-8.
@@ -36,7 +36,7 @@ extension FLACContainer.Metadata {
         public let colorDepth: Int
         
         /// For indexed-color pictures (e.g. GIF), the number of colors used, or 0 for non-indexed pictures.
-        public let colorsUsedCount: Int
+        public let paletteSize: Int
         
         /// The binary picture data.
         public let data: Data
@@ -59,7 +59,7 @@ extension FLACContainer.Metadata {
             self.width = try handler.decodeInt(encoding: .unsigned(bits: 32))
             self.height = try handler.decodeInt(encoding: .unsigned(bits: 32))
             self.colorDepth = try handler.decodeInt(encoding: .unsigned(bits: 32))
-            self.colorsUsedCount = try handler.decodeInt(encoding: .unsigned(bits: 32))
+            self.paletteSize = try handler.decodeInt(encoding: .unsigned(bits: 32))
             
             let dataLength = try handler.decodeInt(encoding: .unsigned(bits: 32))
             self.data = try handler.decodeData(bytesCount: dataLength)
@@ -74,7 +74,7 @@ extension FLACContainer.Metadata {
                 descriptor.value(for: \.width)
                 descriptor.value(for: \.height)
                 descriptor.value(for: \.colorDepth)
-                descriptor.value(for: \.colorsUsedCount)
+                descriptor.value(for: \.paletteSize)
             }
         }
         

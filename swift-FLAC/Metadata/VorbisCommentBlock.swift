@@ -12,81 +12,129 @@ import BitwiseOperators
 
 extension FLACContainer.Metadata {
     
-    /// This block is for storing a list of human-readable name/value pairs.
+    /// Aka FLAC tags, this block is for storing a list of human-readable name/value pairs.
     ///
-    /// Values are encoded using UTF-8. It is an implementation of the [Vorbis comment specification](https://xiph.org/vorbis/doc/v-comment.html) (without the framing bit). This is the only officially supported tagging mechanism in FLAC. There may be only one `VORBIS_COMMENT` block in a stream. In some external documentation, Vorbis comments are called FLAC tags to lessen confusion.
+    /// It is an implementation of the [Vorbis comment specification](https://xiph.org/vorbis/doc/v-comment.html) (without the framing bit). This is the only officially supported tagging mechanism in FLAC. In some external documentation, Vorbis comments are called *FLAC tags* to lessen confusion.
     ///
-    /// Also known as FLAC tags, the contents of a vorbis comment packet as specified here (without the framing bit). Note that the vorbis comment spec allows for on the order of 2 ^ 64 bytes of data where as the FLAC metadata block is limited to 2 ^ 24 bytes. Given the stated purpose of vorbis comments, i.e. human-readable textual information, this limit is unlikely to be restrictive. Also note that the 32-bit field lengths are little-endian coded according to the vorbis spec, as opposed to the usual big-endian coding of fixed-length integers in the rest of FLAC.
+    /// The ``VorbisCommentBlock/tags`` encodes all key-value pairs defined in this block. The other properties, excluding ``VorbisCommentBlock/vendor``, are shorthands for lookups in this dictionary.
+    ///
+    /// - Tip: The properties (keys) can be lookup by name at runtime, [read more on swift.org](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/attributes#dynamicMemberLookup).
+    ///
+    /// ## Topics
+    /// ### Stored Properties
+    ///
+    /// - ``vendor``
+    /// - ``tags``
+    @dynamicMemberLookup
     public struct VorbisCommentBlock: CustomDetailedStringConvertible {
         
+        /// The encoder used.
         public let vendor: String
         
+        /// Every tag defined in this block.
+        public let tags: [String: String]
+        
         /// Track/Work name
-        public private(set) var title: String?
+        public var title: String? {
+            tags["TITLE"]
+        }
         
         /// The version field may be used to differentiate multiple versions of the same track title in a single collection. (e.g. remix info)
-        public private(set) var version: String?
+        public var version: String? {
+            tags["VERSION"]
+        }
         
         /// The collection name to which this track belongs
-        public private(set) var album: String?
+        public var album: String? {
+            tags["ALBUM"]
+        }
         
         /// The track number of this piece if part of a specific larger collection or album
-        public private(set) var trackNumber: String?
+        public var trackNumber: String? {
+            tags["TRACKNUMBER"]
+        }
         
         /// The artist generally considered responsible for the work.
         ///
         /// In popular music this is usually the performing band or singer. For classical music it would be the composer. For an audio book it would be the author of the original text.
-        public private(set) var artist: String?
+        public var artist: String? {
+            tags["ARTIST"]
+        }
         
         /// The artist(s) who performed the work.
         ///
         /// In classical music this would be the conductor, orchestra, soloists. In an audio book it would be the actor who did the reading. In popular music this is typically the same as the ARTIST and is omitted.
-        public private(set) var performer: String?
+        public var performer: String? {
+            tags["PERFORMER"]
+        }
         
         /// Copyright attribution, e.g., '2001 Nobody's Band' or '1999 Jack Moffitt'
-        public private(set) var copyright: String?
+        public var copyright: String? {
+            tags["COPYRIGHT"]
+        }
         
         /// License information, for example, 'All Rights Reserved', 'Any Use Permitted', a URL to a license such as a Creative Commons license (e.g. "creativecommons.org/licenses/by/4.0/"), or similar.
-        public private(set) var license: String?
+        public var license: String? {
+            tags["LICENSE"]
+        }
         
         /// Name of the organization producing the track (i.e. the 'record label')
-        public private(set) var organization: String?
+        public var organization: String? {
+            tags["ORGANIZATION"]
+        }
         
         /// A short text description of the contents
-        public private(set) var description: String?
+        public var description: String? {
+            tags["DESCRIPTION"]
+        }
         
         /// A short text indication of music genre
-        public private(set) var genre: String?
+        public var genre: String? {
+            tags["GENRE"]
+        }
         
         /// Date the track was recorded
-        public private(set) var date: String?
+        public var date: String? {
+            tags["DATE"]
+        }
         
         /// Location where track was recorded
-        public private(set) var location: String?
+        public var location: String? {
+            tags["LOCATION"]
+        }
         
         /// Contact information for the creators or distributors of the track.
         ///
         /// This could be a URL, an email address, the physical address of the producing label.
-        public private(set) var contact: String?
+        public var contact: String? {
+            tags["CONTACT"]
+        }
         
         /// ISRC number for the track; see the [ISRC intro page](https://isrc.ifpi.org/en/) for more information on ISRC numbers.
-        public private(set) var ISRC: String?
+        public var ISRC: String? {
+            tags["ISRC"]
+        }
         
         
         /// Common property added by the `Swift-FLAC` package.
-        public private(set) var albumArtist: String?
+        public var albumArtist: String? {
+            tags["ALBUMARTIST"]
+        }
         
         /// Common property added by the `Swift-FLAC` package.
-        public private(set) var composer: String?
+        public var composer: String? {
+            tags["COMPOSER"]
+        }
         
         /// Common property added by the `Swift-FLAC` package.
-        public private(set) var discNumber: String?
+        public var discNumber: String? {
+            tags["DISCNUMBER"]
+        }
         
         /// Common property added by the `Swift-FLAC` package.
-        public private(set) var comment: String?
-        
-        /// The additional information not covered by the predefined properties.
-        public let additionalInformation: [String: String]
+        public var comment: String? {
+            tags["COMMENT"]
+        }
         
         
         init(data: Data) throws {
@@ -95,7 +143,7 @@ extension FLACContainer.Metadata {
             self.vendor = try handler.decodeString(bytesCount: vendorLength, encoding: .utf8)
             
             
-            var additionalInformation: [String: String] = [:]
+            var tags: [String: String] = [:]
             
             let userCommentListLength = try handler.decodeInt(encoding: .unsigned(bits: 32, endianness: .littleEndian))
             for _ in 1...userCommentListLength {
@@ -107,62 +155,25 @@ extension FLACContainer.Metadata {
                 let value = String(content[content.index(after: separator)...])
                 guard !value.allSatisfy({ $0.isWhitespace }) else { continue }
                 
-                switch key.uppercased() {
-                case "TITLE": self.title = value
-                case "VERSION": self.version = value
-                case "ALBUM": self.album = value
-                case "TRACKNUMBER": self.trackNumber = value
-                case "ARTIST": self.artist = value
-                case "PERFORMER": self.performer = value
-                case "COPYRIGHT": self.copyright = value
-                case "LICENSE": self.license = value
-                case "ORGANIZATION": self.organization = value
-                case "DESCRIPTION": self.description = value
-                case "GENRE": self.genre = value
-                case "DATE": self.date = value
-                case "LOCATION": self.location = value
-                case "CONTACT": self.contact = value
-                case "ISRC": self.ISRC = value
-                case "ALBUMARTIST": self.albumArtist = value
-                case "COMPOSER": self.composer = value
-                case "DISCNUMBER": self.discNumber = value
-                case "COMMENT": self.comment = value
-                default: additionalInformation[key] = value
-                }
+                tags[key] = value
             }
             
-            self.additionalInformation = additionalInformation
+            self.tags = tags
         }
         
         
         public func detailedDescription(using descriptor: DetailedDescription.Descriptor<FLACContainer.Metadata.VorbisCommentBlock>) -> any DescriptionBlockProtocol {
             descriptor.container {
                 descriptor.value(for: \.vendor)
-                descriptor.optional(for: \.title)
-                descriptor.optional(for: \.version)
-                descriptor.optional(for: \.album)
-                descriptor.optional(for: \.albumArtist)
-                descriptor.optional(for: \.trackNumber)
-                descriptor.optional(for: \.artist)
-                descriptor.optional(for: \.performer)
-                descriptor.optional(for: \.copyright)
-                descriptor.optional(for: \.license)
-                descriptor.optional(for: \.organization)
-                descriptor.optional(for: \.description)
-                descriptor.optional(for: \.genre)
-                descriptor.optional(for: \.date)
-                descriptor.optional(for: \.location)
-                descriptor.optional(for: \.contact)
-                descriptor.optional(for: \.ISRC)
-                descriptor.optional(for: \.albumArtist)
-                descriptor.optional(for: \.composer)
-                descriptor.optional(for: \.discNumber)
-                descriptor.optional(for: \.comment)
                 
-                for (key, value) in additionalInformation {
+                for (key, value) in tags {
                     descriptor.value(key, of: value)
                 }
             }
+        }
+        
+        subscript(dynamicMember dynamicMember: String) -> String? {
+            self.tags[dynamicMember]
         }
         
     }
