@@ -4,6 +4,18 @@ on:
     branches:
       - '**'
 jobs:
+  build_docC:
+    runs-on: macos-12
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+      with:
+       repository: ${{ github.event.pull_request.head.repo.full_name }}
+       ref: ${{ github.event.pull_request.head.ref }}
+
+    - name: build static site
+      uses: actions/build-docC-static-site@v1.0.2
+      
   build_deploy_site:
     runs-on: ubuntu-latest
     environment:
@@ -18,6 +30,4 @@ jobs:
     steps:
      - name: Deploy DocC To Github-Pages
        uses: kiarashvosough1999/docC-github-pages-deploy@v1.0.0
-       with: 
-         docC-generated-static-site-uploaded-name: docc
          
