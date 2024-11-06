@@ -4,7 +4,7 @@ on:
     branches:
       - '**'
 jobs:
-  build_docC:
+  Build_DocC:
     runs-on: macos-latest
     
     environment:
@@ -57,7 +57,7 @@ jobs:
         gtar --dereference --hard-dereference --directory $DocC_Static_Site_Build_Ouptput_Path -cvf $Zipped_Site_Output_Directory --exclude=.git --exclude=.github .
 
     - name: Upload DocC Artifact
-      uses: actions/upload-artifact@main
+      uses: actions/upload-artifact@v4
       with:
         name: doccarchive
         path: ${{ runner.temp }}/doccarchive.tar
@@ -65,7 +65,7 @@ jobs:
         if-no-files-found: error
         
   # https://github.com/kiarashvosough1999/docC-github-pages-deploy/blob/master/action.yml
-  upload_docC:
+  Deploy_DocC:
     runs-on: ubuntu-latest
    
     environment:
@@ -79,7 +79,7 @@ jobs:
       
     steps:
       - name: Download a DocC Generated Static Site Zipped artifact
-        uses: actions/download-artifact@main
+        uses: actions/download-artifact@v4
         with:
           name: doccarchive
   
@@ -96,14 +96,14 @@ jobs:
           destination: ./doccarchive/__site
   
       - name: Upload Static Site Artifacts
-        uses: actions/upload-pages-artifact@v0
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./doccarchive/__site
           retention-days: 1
   
       - name: Deploy To Pages
         id: deploy-step
-        uses: actions/deploy-pages@v1
+        uses: actions/deploy-pages@v4
         with:
           emit_telemetry: false
           timeout: 600000
