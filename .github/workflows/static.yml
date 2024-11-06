@@ -69,37 +69,50 @@ jobs:
         retention-days: 1
         if-no-files-found: error
         
-   # https://github.com/kiarashvosough1999/docC-github-pages-deploy/blob/master/action.yml
-    - name: Download a DocC Generated Static Site Zipped artifact
-      uses: actions/download-artifact@main
-      with:
-        name: docc
-
-    - name: Unarchive Artifact
-      shell: bash
-      run: |
-        mkdir docc
-        tar -xf docc.tar -C ./docc
-
-    - name: Build Static Site With Jekyll
-      uses: actions/jekyll-build-pages@v1
-      with:
-        source: ./docc
-        destination: ./docc/__site
-
-    - name: Upload Static Site Artifacts
-      uses: actions/upload-pages-artifact@v0
-      with:
-        path: ./docc/__site
-        retention-days: 1
-
-    - name: Deploy To Pages
-      id: deploy-step
-      uses: actions/deploy-pages@v1
-      with:
-        emit_telemetry: false
-        timeout: 600000
-        error_count: 10
-        reporting_interval: 5000
-        artifact_name: github-pages
-         
+  # https://github.com/kiarashvosough1999/docC-github-pages-deploy/blob/master/action.yml
+  upload_docC:
+    runs-on: linux-latest
+   
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+  
+    permissions:
+      pages: write
+      contents: read
+      id-token: write
+      
+    steps:
+      - name: Download a DocC Generated Static Site Zipped artifact
+        uses: actions/download-artifact@main
+        with:
+          name: docc
+  
+      - name: Unarchive Artifact
+        shell: bash
+        run: |
+          mkdir docc
+          tar -xf docc.tar -C ./docc
+  
+      - name: Build Static Site With Jekyll
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./docc
+          destination: ./docc/__site
+  
+      - name: Upload Static Site Artifacts
+        uses: actions/upload-pages-artifact@v0
+        with:
+          path: ./docc/__site
+          retention-days: 1
+  
+      - name: Deploy To Pages
+        id: deploy-step
+        uses: actions/deploy-pages@v1
+        with:
+          emit_telemetry: false
+          timeout: 600000
+          error_count: 10
+          reporting_interval: 5000
+          artifact_name: github-pages
+           
