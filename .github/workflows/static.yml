@@ -30,7 +30,7 @@ jobs:
         mkdir $DocC_Static_Site_Build_Ouptput_Path
 
     - name: Build DocC
-      shell: bash
+      shell: zsh
       env:
         DocC_Static_Site_Build_Ouptput_Path: ./docc_static_site
         DocC_Derived_Data_Path_Build: ./.doc_build
