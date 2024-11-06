@@ -35,6 +35,7 @@ jobs:
         DocC_Static_Site_Build_Ouptput_Path: ./docc_static_site
         DocC_Derived_Data_Path_Build: ./.doc_build
         DocC_Target: SwiftFLAC
+        GITHUB_REPOSITORY: ${{ github.repository }}
       run: |
         Package_Name=$(basename "$PWD")
         DocC_Find_Executable_Path=$(xcrun --find docc)
@@ -43,7 +44,8 @@ jobs:
 
         Docc_Generated_Archive_Path=$DocC_Derived_Data_Path_Build/Build/Products/Debug/$DocC_Target.doccarchive
 
-        $DocC_Find_Executable_Path process-archive transform-for-static-hosting $Docc_Generated_Archive_Path --output-path $DocC_Static_Site_Build_Ouptput_Path --hosting-base-path $Package_Name
+        REPO_NAME="${GITHUB_REPOSITORY##*/}"
+        $DocC_Find_Executable_Path process-archive transform-for-static-hosting $Docc_Generated_Archive_Path --output-path $DocC_Static_Site_Build_Ouptput_Path --hosting-base-path $REPO_NAME  
 
     - name: Archive DocC Generated Site Artifact
       shell: bash
