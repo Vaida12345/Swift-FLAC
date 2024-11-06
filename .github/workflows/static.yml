@@ -52,7 +52,7 @@ jobs:
       shell: bash
       env:
         DocC_Static_Site_Build_Ouptput_Path: ./docc_static_site
-        Zipped_Site_Output_Directory: ${{ runner.temp }}/docc.tar
+        Zipped_Site_Output_Directory: ${{ runner.temp }}/doccarchive.tar
       run: |
         gtar --dereference --hard-dereference --directory $DocC_Static_Site_Build_Ouptput_Path -cvf $Zipped_Site_Output_Directory --exclude=.git --exclude=.github .
 
