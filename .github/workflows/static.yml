@@ -32,13 +32,14 @@ jobs:
       env:
         DocC_Static_Site_Build_Ouptput_Path: ./docc_static_site
         DocC_Derived_Data_Path_Build: ./.doc_build
+        DocC_Target: SwiftFLAC
       run: |
         Package_Name=$(basename "$PWD")
         DocC_Find_Executable_Path=$(xcrun --find docc)
 
-        xcodebuild docbuild -scheme SwiftFLAC -destination 'platform=macOS,arch=arm64' -derivedDataPath $DocC_Derived_Data_Path_Build
+        xcodebuild docbuild -scheme $DocC_Target -destination 'platform=macOS,arch=arm64' -derivedDataPath $DocC_Derived_Data_Path_Build
 
-        Docc_Generated_Archive_Path=$(find . -regex 'SwiftFLAC.doccarchive')
+        Docc_Generated_Archive_Path=$DocC_Derived_Data_Path_Build/Build/Products/Debug/$DocC_Target.doccarchive
 
         $DocC_Find_Executable_Path process-archive transform-for-static-hosting $Docc_Generated_Archive_Path --output-path $DocC_Static_Site_Build_Ouptput_Path --hosting-base-path $Package_Name
 
@@ -53,8 +54,8 @@ jobs:
     - name: Upload DocC Artifact
       uses: actions/upload-artifact@main
       with:
-        name: ${{ inputs.docC-generated-static-site-zipped-upload-name }}
-        path: ${{ runner.temp }}/${{ inputs.docC-generated-static-site-zipped-upload-name }}.tar
+        name: docc
+        path: ${{ runner.temp }}/docc.tar
         retention-days: 1
         if-no-files-found: error
       
@@ -72,4 +73,6 @@ jobs:
     steps:
      - name: Deploy DocC To Github-Pages
        uses: kiarashvosough1999/docC-github-pages-deploy@v1.0.0
+       with:
+         docC-generated-static-site-uploaded-name: docc
          
