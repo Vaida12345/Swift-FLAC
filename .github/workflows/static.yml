@@ -10,11 +10,6 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
-    permissions:
-      pages: write
-      contents: read
-      id-token: write
       
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
@@ -64,14 +59,14 @@ jobs:
     - name: Upload DocC Artifact
       uses: actions/upload-artifact@main
       with:
-        name: docc
-        path: ${{ runner.temp }}/docc.tar
+        name: doccarchive
+        path: ${{ runner.temp }}/doccarchive.tar
         retention-days: 1
         if-no-files-found: error
         
   # https://github.com/kiarashvosough1999/docC-github-pages-deploy/blob/master/action.yml
   upload_docC:
-    runs-on: linux-latest
+    runs-on: ubuntu-latest
    
     environment:
       name: github-pages
@@ -86,24 +81,24 @@ jobs:
       - name: Download a DocC Generated Static Site Zipped artifact
         uses: actions/download-artifact@main
         with:
-          name: docc
+          name: doccarchive
   
       - name: Unarchive Artifact
         shell: bash
         run: |
-          mkdir docc
-          tar -xf docc.tar -C ./docc
+          mkdir doccarchive
+          tar -xf doccarchive.tar -C ./doccarchive
   
       - name: Build Static Site With Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
-          source: ./docc
-          destination: ./docc/__site
+          source: ./doccarchive
+          destination: ./doccarchive/__site
   
       - name: Upload Static Site Artifacts
         uses: actions/upload-pages-artifact@v0
         with:
-          path: ./docc/__site
+          path: ./doccarchive/__site
           retention-days: 1
   
       - name: Deploy To Pages
