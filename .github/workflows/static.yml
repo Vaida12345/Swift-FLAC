@@ -40,7 +40,7 @@ jobs:
         Package_Name=$(basename "$PWD")
         DocC_Find_Executable_Path=$(xcrun --find docc)
 
-        xcodebuild docbuild -scheme $DocC_Target -destination 'platform=macOS,arch=arm64' -derivedDataPath $DocC_Derived_Data_Path_Build
+        xcodebuild docbuild -scheme $DocC_Target -destination 'platform=macOS,arch=arm64' -derivedDataPath $DocC_Derived_Data_Path_Build -quiet
 
         Docc_Generated_Archive_Path=$DocC_Derived_Data_Path_Build/Build/Products/Debug/$DocC_Target.doccarchive
 
