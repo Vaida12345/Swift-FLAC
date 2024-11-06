@@ -90,7 +90,7 @@ jobs:
       - name: Build Static Site With Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
-          source: ./doccarchive
+          source: ./doccarchive/documentation/swiftflac
           destination: ./doccarchive/__site
   
       - name: Upload Static Site Artifacts
