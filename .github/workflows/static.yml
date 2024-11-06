@@ -4,5 +4,4 @@
   uses: kiarashvosough1999/docC-github-pages-deploy@v1.0.0
   with:
     # The name of the ziped artifact which was uploaded on previous steps.(artifact must be zipped with .tar extension only)
-    docC-generated-static-site-uploaded-name: # default is docC_generated_site_zipped
-          
+    docC-generated-static-site-uploaded-name: docc_zip
