@@ -17,7 +17,7 @@ let package = Package(
     targets: [
         .target(
             name: "SwiftFLAC",
-            dependencies: ["DetailedDescription", "BitwiseOperators"],
+            dependencies: ["DetailedDescription", "BitwiseOperators", "SwiftAIFF"],
             path: "Swift-FLAC"
         ),
         .target(
