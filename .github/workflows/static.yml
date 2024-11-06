@@ -36,9 +36,9 @@ jobs:
         Package_Name=$(basename "$PWD")
         DocC_Find_Executable_Path=$(xcrun --find docc)
 
-        xcodebuild docbuild -scheme SwiftFLAC -destination 'platform=macOS' -derivedDataPath $DocC_Derived_Data_Path_Build
+        xcodebuild docbuild -scheme SwiftFLAC -destination 'platform=macOS,arch=arm64' -derivedDataPath $DocC_Derived_Data_Path_Build
 
-        Docc_Generated_Archive_Path=$(find . -regex '.*/[^/]*.doccarchive')
+        Docc_Generated_Archive_Path=$(find . -regex 'SwiftFLAC.doccarchive')
 
         $DocC_Find_Executable_Path process-archive transform-for-static-hosting $Docc_Generated_Archive_Path --output-path $DocC_Static_Site_Build_Ouptput_Path --hosting-base-path $Package_Name
 
