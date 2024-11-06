@@ -36,7 +36,7 @@ jobs:
         Package_Name=$(basename "$PWD")
         DocC_Find_Executable_Path=$(xcrun --find docc)
 
-        xcodebuild docbuild -scheme $Package_Name -derivedDataPath $DocC_Derived_Data_Path_Build -destination 'platform=iOS Simulator,name=iPhone 13'
+        xcodebuild docbuild -scheme Swift-FLAC-Package -destination 'platform=macOS' -derivedDataPath $DocC_Derived_Data_Path_Build
 
         Docc_Generated_Archive_Path=$(find . -regex '.*/[^/]*.doccarchive')
 
