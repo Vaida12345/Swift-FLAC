@@ -172,7 +172,7 @@ extension FLACContainer.Metadata {
             }
         }
         
-        subscript(dynamicMember dynamicMember: String) -> String? {
+        public subscript(dynamicMember dynamicMember: String) -> String? {
             self.tags[dynamicMember]
         }
         
