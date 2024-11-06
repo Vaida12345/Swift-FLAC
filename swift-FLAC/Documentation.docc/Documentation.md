@@ -15,8 +15,8 @@ In this package, ``FLACContainer`` encapsulates FLAC documents. The ``FLACContai
 
 ### Initialize a document
 
-- ``FLACContainer/init(at:)``
-- ``FLACContainer/init(data:)``
+- ``FLACContainer/init(at:options:))``
+- ``FLACContainer/init(data:options:))``
 
 ### Inspect metadata
 
