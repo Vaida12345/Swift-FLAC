@@ -17,6 +17,4 @@ jobs:
 
     steps:
      - name: Swift DocC Action
-  # You may pin to the exact commit or the version.
-  # uses: fwcd/swift-docc-action@3c0d98e9eb344aa66952020b4cecda0eb8b69858
-  uses: fwcd/swift-docc-action@v1.0.2
+       uses: fwcd/swift-docc-action@v1.0.2
