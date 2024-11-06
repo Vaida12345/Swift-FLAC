@@ -45,7 +45,8 @@ jobs:
         $DocC_Find_Executable_Path process-archive transform-for-static-hosting $Docc_Generated_Archive_Path --output-path $DocC_Static_Site_Build_Ouptput_Path --hosting-base-path $REPO_NAME
 
         # redirects to the document
-        echo "<script>window.location.href += \"/documentation/${DocC_Target,,}\"</script>" > "$DocC_Static_Site_Build_Ouptput_Path/index.html"
+        low=$(echo "$DocC_Target" | tr '[:upper:]' '[:lower:]')
+        echo "<script>window.location.href += \"/documentation/$low\"</script>" > "$DocC_Static_Site_Build_Ouptput_Path/index.html"
 
     - name: Archive DocC Generated Site Artifact
       shell: bash
