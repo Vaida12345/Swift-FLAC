@@ -2,7 +2,7 @@ name: DocC
 on:
   push:
     branches:
-      - '**'
+      - 'main'
 jobs:
   Build_DocC:
     runs-on: macos-latest
@@ -10,7 +10,7 @@ jobs:
     env:
       # The DocC target, change this to your target.
       DocC_Target: SwiftFLAC
-      # on complete, the webpage is located at `https://vaida12345.github.io/<repo>/documentation/swiftflac`
+      # on complete, the webpage is located at `https://vaida12345.github.io/<repo>/documentation/<target_lowercased>`
       
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
