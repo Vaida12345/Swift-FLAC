@@ -5,8 +5,8 @@
 
 ### Initialize a document
 
-- ``FLACContainer/init(at:options:))``
-- ``FLACContainer/init(data:options:))``
+- ``FLACContainer/init(at:options:)``
+- ``FLACContainer/init(data:options:)``
 
 ### Inspect metadata
 
