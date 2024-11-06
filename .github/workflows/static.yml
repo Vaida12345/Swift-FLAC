@@ -5,20 +5,58 @@ on:
       - '**'
 jobs:
   build_docC:
-    runs-on: macos-12
+    runs-on: macos-latest
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
         xcode-version: latest-stable
-        
+
+    # https://github.com/kiarashvosough1999/build-docC-static-site/blob/master/action.yml
     - name: checkout
       uses: actions/checkout@v3
       with:
        repository: ${{ github.event.pull_request.head.repo.full_name }}
        ref: ${{ github.event.pull_request.head.ref }}
 
-    - name: build static site
-      uses: kiarashvosough1999/build-docC-static-site@v1.0.2
+    - name: Prepare Building DocC
+      shell: bash
+      env:
+        DocC_Static_Site_Build_Ouptput_Path: ./docc_static_site
+        DocC_Derived_Data_Path_Build: ./.doc_build
+      run: |
+        mkdir $DocC_Derived_Data_Path_Build
+        mkdir $DocC_Static_Site_Build_Ouptput_Path
+
+    - name: Build DocC
+      shell: bash
+      env:
+        DocC_Static_Site_Build_Ouptput_Path: ./docc_static_site
+        DocC_Derived_Data_Path_Build: ./.doc_build
+      run: |
+        Package_Name=$(basename "$PWD")
+        DocC_Find_Executable_Path=$(xcrun --find docc)
+
+        xcodebuild docbuild -scheme $Package_Name -derivedDataPath $DocC_Derived_Data_Path_Build -destination 'platform=iOS Simulator,name=iPhone 13'
+
+        Docc_Generated_Archive_Path=$(find . -regex '.*/[^/]*.doccarchive')
+
+        $DocC_Find_Executable_Path process-archive transform-for-static-hosting $Docc_Generated_Archive_Path --output-path $DocC_Static_Site_Build_Ouptput_Path --hosting-base-path $Package_Name
+
+    - name: Archive DocC Generated Site Artifact
+      shell: bash
+      env:
+        DocC_Static_Site_Build_Ouptput_Path: ./docc_static_site
+        Zipped_Site_Output_Directory: ${{ runner.temp }}/${{ inputs.docC-generated-static-site-zipped-upload-name }}.tar
+      run: |
+        gtar --dereference --hard-dereference --directory $DocC_Static_Site_Build_Ouptput_Path -cvf $Zipped_Site_Output_Directory --exclude=.git --exclude=.github .
+
+    - name: Upload DocC Artifact
+      uses: actions/upload-artifact@main
+      with:
+        name: ${{ inputs.docC-generated-static-site-zipped-upload-name }}
+        path: ${{ runner.temp }}/${{ inputs.docC-generated-static-site-zipped-upload-name }}.tar
+        retention-days: 1
+        if-no-files-found: error
       
   build_deploy_site:
     runs-on: ubuntu-latest
