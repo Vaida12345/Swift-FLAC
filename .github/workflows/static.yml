@@ -68,9 +68,10 @@ jobs:
         path: ${{ runner.temp }}/docc.tar
         retention-days: 1
         if-no-files-found: error
+        
    # https://github.com/kiarashvosough1999/docC-github-pages-deploy/blob/master/action.yml
     - name: Download a DocC Generated Static Site Zipped artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@main
       with:
         name: docc
 
