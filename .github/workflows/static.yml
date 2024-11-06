@@ -18,10 +18,7 @@ jobs:
 
     # https://github.com/kiarashvosough1999/build-docC-static-site/blob/master/action.yml
     - name: checkout
-      uses: actions/checkout@v3
-      with:
-       repository: ${{ github.event.pull_request.head.repo.full_name }}
-       ref: ${{ github.event.pull_request.head.ref }}
+      uses: actions/checkout@v4
 
     - name: Prepare Building DocC
       shell: bash
@@ -106,7 +103,6 @@ jobs:
         id: deploy-step
         uses: actions/deploy-pages@v4
         with:
-          emit_telemetry: false
           timeout: 600000
           error_count: 10
           reporting_interval: 5000
