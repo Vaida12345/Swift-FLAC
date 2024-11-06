@@ -1,7 +1,20 @@
-- name: Deploy DocC To Github-Pages
-  # You may pin to the exact commit or the version.
-  # uses: kiarashvosough1999/docC-github-pages-deploy@ab7ea8fb02596a4f2ae75e8d411396b6e07a255b
-  uses: kiarashvosough1999/docC-github-pages-deploy@v1.0.0
-  with:
-    # The name of the ziped artifact which was uploaded on previous steps.(artifact must be zipped with .tar extension only)
-    docC-generated-static-site-uploaded-name: docc_zip
+name: DocC
+on:
+  push:
+    branches:
+      - '**'
+jobs:
+  build_deploy_site:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    permissions:
+      pages: write
+      contents: read
+      id-token: write
+
+    steps:
+    - name: deploy static site
+      uses: kiarashvosough1999/docC-github-pages-deploy@v1.0.0
