@@ -6,6 +6,16 @@ on:
 jobs:
   build_docC:
     runs-on: macos-latest
+    
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    permissions:
+      pages: write
+      contents: read
+      id-token: write
+      
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
@@ -58,21 +68,9 @@ jobs:
         path: ${{ runner.temp }}/docc.tar
         retention-days: 1
         if-no-files-found: error
-      
-  build_deploy_site:
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
 
-    permissions:
-      pages: write
-      contents: read
-      id-token: write
-
-    steps:
-     - name: Deploy DocC To Github-Pages
-       uses: kiarashvosough1999/docC-github-pages-deploy@v1.0.0
-       with:
+    - name: Deploy DocC To Github-Pages
+      uses: kiarashvosough1999/docC-github-pages-deploy@v1.0.0
+      with:
          docC-generated-static-site-uploaded-name: docc
          
