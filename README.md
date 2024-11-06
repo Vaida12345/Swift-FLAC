@@ -45,3 +45,7 @@ You can add this framework as a dependency to your Xcode project by clicking Fil
 ```
 https://github.com/Vaida12345/Swift-FLAC
 ```
+
+## Documentation
+
+This package uses [DocC](https://www.swift.org/documentation/docc/) for documentation.
