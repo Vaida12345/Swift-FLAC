@@ -16,5 +16,8 @@ jobs:
       id-token: write
 
     steps:
-     - name: Swift DocC Action
-       uses: fwcd/swift-docc-action@v1.0.2
+     - name: Deploy DocC To Github-Pages
+       uses: kiarashvosough1999/docC-github-pages-deploy@v1.0.0
+       with: 
+         docC-generated-static-site-uploaded-name: docc
+         
