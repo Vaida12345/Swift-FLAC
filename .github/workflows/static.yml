@@ -67,6 +67,7 @@ jobs:
   # https://github.com/kiarashvosough1999/docC-github-pages-deploy/blob/master/action.yml
   Deploy_DocC:
     runs-on: ubuntu-latest
+    needs: Build_DocC
    
     environment:
       name: github-pages
