@@ -6,6 +6,10 @@ on:
 jobs:
   Build_DocC:
     runs-on: macos-latest
+
+    env:
+     # The DocC target, change this to your target.
+     DocC_Target: SwiftFLAC
       
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
@@ -30,7 +34,6 @@ jobs:
       env:
         DocC_Static_Site_Build_Ouptput_Path: ./docc_static_site
         DocC_Derived_Data_Path_Build: ./.doc_build
-        DocC_Target: SwiftFLAC
         GITHUB_REPOSITORY: ${{ github.repository }}
       run: |
         Package_Name=$(basename "$PWD")
@@ -43,7 +46,7 @@ jobs:
         REPO_NAME="${GITHUB_REPOSITORY##*/}"
         $DocC_Find_Executable_Path process-archive transform-for-static-hosting $Docc_Generated_Archive_Path --output-path $DocC_Static_Site_Build_Ouptput_Path --hosting-base-path $REPO_NAME
 
-        echo '<script>window.location.href += "/documentation/${val,,}"</script>' > $DocC_Static_Site_Build_Ouptput_Path/index.html
+        echo "<script>window.location.href += \"/documentation/${DocC_Target,,}\"</script>" > "$DocC_Static_Site_Build_Ouptput_Path/index.html"
 
     - name: Archive DocC Generated Site Artifact
       shell: bash
