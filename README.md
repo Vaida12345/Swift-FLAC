@@ -48,4 +48,4 @@ https://github.com/Vaida12345/Swift-FLAC
 
 ## Documentation
 
-This package uses [DocC](https://www.swift.org/documentation/docc/) for documentation.
+This package uses [DocC](https://www.swift.org/documentation/docc/) for documentation. [View on Github Pages](https://vaida12345.github.io/Swift-FLAC/documentation/swiftflac/)
