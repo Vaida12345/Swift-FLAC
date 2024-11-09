@@ -82,7 +82,7 @@ public struct AIFFContainer: CustomDetailedStringConvertible {
     }
     
     public func write(to handle: inout FileHandle) throws {
-        if #available(macOS 10.15.4, *) {
+        if #available(macOS 10.15.4, iOS 13.4, watchOS 6.2, tvOS 13.4, *) {
             try handle.write(contentsOf: chunkID.data(using: .utf8)!)
             try handle.write(contentsOf: chunkSize.bigEndian.data)
             try handle.write(contentsOf: formType.data(using: .utf8)!)
