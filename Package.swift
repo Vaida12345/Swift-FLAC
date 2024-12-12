@@ -12,7 +12,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/Vaida12345/DetailedDescription.git", from: "1.0.0")
+        .package(url: "https://www.github.com/Vaida12345/DetailedDescription", from: "1.0.0")
     ],
     targets: [
         .target(
