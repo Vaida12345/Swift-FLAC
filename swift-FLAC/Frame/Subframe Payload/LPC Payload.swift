@@ -12,7 +12,7 @@ import BitwiseOperators
 
 extension FLACContainer.Frame.Subframe.Payload {
     
-    public struct LPC: CustomDetailedStringConvertible, PayloadProtocol {
+    public struct LPC: DetailedStringConvertible, PayloadProtocol {
         
         public let warmup: Warmup
         

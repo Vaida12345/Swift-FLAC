@@ -12,7 +12,7 @@ import BitwiseOperators
 
 extension FLACContainer.Frame {
     
-    public struct Header: CustomDetailedStringConvertible {
+    public struct Header: DetailedStringConvertible {
         
         public let blockStrategy: BlockStrategy
         

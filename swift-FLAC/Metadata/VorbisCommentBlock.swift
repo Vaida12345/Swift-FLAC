@@ -26,7 +26,7 @@ extension FLACContainer.Metadata {
     /// - ``vendor``
     /// - ``tags``
     @dynamicMemberLookup
-    public struct VorbisCommentBlock: CustomDetailedStringConvertible {
+    public struct VorbisCommentBlock: DetailedStringConvertible {
         
         /// The encoder used.
         public let vendor: String

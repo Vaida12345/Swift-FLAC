@@ -24,7 +24,7 @@ extension FLACContainer {
     /// - ``FLACContainer/Metadata-swift.struct/cueSheet``
     /// - ``FLACContainer/Metadata-swift.struct/pictures``
     /// - ``FLACContainer/Metadata-swift.struct/rawFields``
-    public struct Metadata: CustomDetailedStringConvertible {
+    public struct Metadata: DetailedStringConvertible {
         
         /// This block has information about the whole stream, like sample rate, number of channels, total number of samples, etc.
         ///
@@ -89,12 +89,15 @@ extension FLACContainer {
         public func detailedDescription(using descriptor: DetailedDescription.Descriptor<FLACContainer.Metadata>) -> any DescriptionBlockProtocol {
             descriptor.container {
                 descriptor.value(for: \.streamInfo)
-                descriptor.sequence(for: \.application, hideEmptySequence: true)
+                descriptor.sequence(for: \.application)
+                    .hideEmptySequence()
                 descriptor.optional(for: \.seekTable)
                 descriptor.optional(for: \.vorbisComment)
                 descriptor.optional(for: \.cueSheet)
-                descriptor.sequence(for: \.pictures, hideEmptySequence: true)
-                descriptor.sequence(for: \.rawFields, hideEmptySequence: true)
+                descriptor.sequence(for: \.pictures)
+                    .hideEmptySequence()
+                descriptor.sequence(for: \.rawFields)
+                    .hideEmptySequence()
             }
         }
         

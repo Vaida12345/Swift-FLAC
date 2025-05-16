@@ -17,7 +17,7 @@ extension FLACContainer.Frame.Subframe.Payload {
     /// The error signal is coded using Rice codes in one of two ways: 1) the encoder estimates a single Rice parameter based on the variance of the residual and Rice codes the entire residual using this parameter; 2) the residual is partitioned into several equal-length regions of contiguous samples, and each region is coded with its own Rice parameter based on the region's mean. (Note that the first method is a special case of the second method with one partition, except the Rice parameter is based on the residual variance instead of the mean.)
     ///
     /// - SeeAlso: https://www.ietf.org/archive/id/draft-ietf-cellar-flac-08.pdf
-    public struct Residual: CustomDetailedStringConvertible {
+    public struct Residual: DetailedStringConvertible {
         
         public let partitionOrder: Int
         
@@ -52,7 +52,7 @@ extension FLACContainer.Frame.Subframe.Payload {
         }
         
         
-        public enum Partition: CustomDetailedStringConvertible {
+        public enum Partition: DetailedStringConvertible {
             
             /// The residual samples, which are signed numbers, are represented by unsigned numbers in the Rice code. For positive numbers, the representation is the number doubled, for negative numbers, the representation is the number multiplied by -2 and has 1 subtracted.
             case encoded(version: Version, content: [Int])

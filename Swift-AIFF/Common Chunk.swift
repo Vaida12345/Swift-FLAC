@@ -12,7 +12,7 @@ import BitwiseOperators
 
 extension AIFFContainer {
     
-    public struct CommonChunk: CustomDetailedStringConvertible {
+    public struct CommonChunk: DetailedStringConvertible {
         
         /// 4 Byte String.
         ///

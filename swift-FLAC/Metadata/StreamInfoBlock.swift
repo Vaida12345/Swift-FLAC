@@ -13,7 +13,7 @@ import BitwiseOperators
 extension FLACContainer.Metadata {
     
     /// This block has information about the whole stream, like sample rate, number of channels, total number of samples, etc.
-    public struct StreamInfoBlock: CustomDetailedStringConvertible {
+    public struct StreamInfoBlock: DetailedStringConvertible {
         
         /// The minimum block size (in samples) used in the stream.
         public let minimumBlockSize: Int

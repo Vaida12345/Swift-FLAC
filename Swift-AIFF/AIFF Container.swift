@@ -11,7 +11,7 @@ import BitwiseOperators
 
 
 /// An AIFF file, or, *FORM*
-public struct AIFFContainer: CustomDetailedStringConvertible {
+public struct AIFFContainer: DetailedStringConvertible {
     
     /// 4 Byte String.
     ///

@@ -12,7 +12,7 @@ import BitwiseOperators
 
 extension FLACContainer.Frame.Subframe {
     
-    public struct Header: CustomDetailedStringConvertible {
+    public struct Header: DetailedStringConvertible {
         
         let type: SubframeType
         

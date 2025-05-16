@@ -12,7 +12,7 @@ import DetailedDescription
 
 extension FLACContainer.Frame.Subframe {
     
-    public enum Payload: CustomDetailedStringConvertible, PayloadProtocol {
+    public enum Payload: DetailedStringConvertible, PayloadProtocol {
         case constant(Constant)
         case fixed(Fixed)
         case lpc(LPC)

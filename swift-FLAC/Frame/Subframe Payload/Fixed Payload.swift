@@ -13,7 +13,7 @@ import Accelerate
 
 extension FLACContainer.Frame.Subframe.Payload {
     
-    public struct Fixed: CustomDetailedStringConvertible, PayloadProtocol {
+    public struct Fixed: DetailedStringConvertible, PayloadProtocol {
         
         /// Unencoded warm-up samples
         public let warmup: Warmup

@@ -15,7 +15,7 @@ import BitwiseOperators
 /// In this package, ``FLACContainer`` encapsulates FLAC documents. The ``FLACContainer/metadata-swift.property`` encodes the metadata, and ``FLACContainer/frames`` encodes the raw frames. 
 ///
 /// - SeeAlso: [FLAC Specifications](https://xiph.org/flac/format.html)
-public struct FLACContainer: CustomDetailedStringConvertible {
+public struct FLACContainer: DetailedStringConvertible {
     
     /// The FLAC metadata.
     public let metadata: Metadata

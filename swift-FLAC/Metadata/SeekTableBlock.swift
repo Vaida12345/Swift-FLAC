@@ -15,7 +15,7 @@ extension FLACContainer.Metadata {
     /// A block for storing seek points.
     ///
     /// It is possible to seek to any given sample in a FLAC stream without a seek table, but the delay can be unpredictable since the bitrate may vary widely within a stream. By adding seek points to a stream, this delay can be significantly reduced. Each seek point takes 18 bytes, so 1% resolution within a stream adds less than 2k. The table can have any number of ``SeekTableBlock/SeekPoint``. There is also a special 'placeholder' ``SeekTableBlock/SeekPoint`` which will be ignored by decoders but which can be used to reserve space for future seek point insertion.
-    public struct SeekTableBlock: CustomDetailedStringConvertible {
+    public struct SeekTableBlock: DetailedStringConvertible {
         
         /// Seek points within a table must be sorted in ascending order by sample number.
         public let points: [SeekPoint]
@@ -41,7 +41,7 @@ extension FLACContainer.Metadata {
         }
         
         
-        public struct SeekPoint: CustomDetailedStringConvertible {
+        public struct SeekPoint: DetailedStringConvertible {
             
             /// Sample number of first sample in the target frame
             public let sampleNumber: Int

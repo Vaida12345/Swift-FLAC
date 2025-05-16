@@ -15,7 +15,7 @@ extension FLACContainer.Metadata {
     /// This block is for storing pictures associated with the file, most commonly cover art from CDs.
     ///
     /// The picture format is similar to the APIC frame in [ID3v2](https://id3.org/id3v2.3.0). The ``PictureBlock`` has a type, ``PictureBlock/MIMEType``, and UTF-8 description like [ID3v2](https://id3.org/id3v2.3.0), and supports external linking via URL (though this is discouraged). The differences are that there is no uniqueness constraint on the ``PictureBlock/description`` field, and the ``PictureBlock/MIMEType`` is mandatory. The ``PictureBlock`` also includes the resolution (``PictureBlock/width``, ``PictureBlock/height``), ``PictureBlock/colorDepth``, and ``PictureBlock/paletteSize`` so that the client can search for a suitable picture without having to scan them all.
-    public struct PictureBlock: CustomDetailedStringConvertible {
+    public struct PictureBlock: DetailedStringConvertible {
         
         /// The picture type according to the ID3v2 APIC frame:
         public let pictureType: PictureType

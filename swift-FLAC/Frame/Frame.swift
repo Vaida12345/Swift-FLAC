@@ -16,7 +16,7 @@ extension FLACContainer {
     /// A Raw FLAC Frame
     ///
     /// A frame header plus one or more subframes.
-    public struct Frame: CustomDetailedStringConvertible {
+    public struct Frame: DetailedStringConvertible {
         
         public let header: Header
         
