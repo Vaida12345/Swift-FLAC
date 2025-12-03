@@ -27,7 +27,7 @@ extension FLACContainer.Metadata {
             var points: [SeekPoint] = []
             points.reserveCapacity(count)
             
-            for _ in 1...count {
+            for _ in 0..<count {
                 try points.append(SeekPoint(handler: &handler))
             }
             

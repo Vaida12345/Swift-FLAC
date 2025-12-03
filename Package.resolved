@@ -1,13 +1,13 @@
 {
-  "originHash" : "2883adaf219765faaaff5b5368c88ed3c5d760112f765c4575ed0f933ed0784f",
+  "originHash" : "850cc306861dbe7296708d4568e726c526432ce18ed37fb36c3fd6794c707335",
   "pins" : [
     {
       "identity" : "detaileddescription",
       "kind" : "remoteSourceControl",
-      "location" : "https://www.github.com/Vaida12345/DetailedDescription.git",
+      "location" : "https://github.com/Vaida12345/DetailedDescription.git",
       "state" : {
-        "revision" : "bee1e194bde199abc091b0420ec928bdcffdb3fb",
-        "version" : "2.0.5"
+        "revision" : "d4ae923e6cc5dadc7219d54cbf31912889f7bf33",
+        "version" : "2.1.1"
       }
     }
   ],

@@ -146,7 +146,7 @@ extension FLACContainer.Metadata {
             var tags: [String: String] = [:]
             
             let userCommentListLength = try handler.decodeInt(encoding: .unsigned(bits: 32, endianness: .littleEndian))
-            for _ in 1...userCommentListLength {
+            for _ in 0..<userCommentListLength {
                 let length = try handler.decodeInt(encoding: .unsigned(bits: 32, endianness: .littleEndian))
                 guard let content = try? handler.decodeString(bytesCount: length, encoding: .utf8) else { continue }
                 
