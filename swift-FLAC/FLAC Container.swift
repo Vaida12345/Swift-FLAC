@@ -69,27 +69,19 @@ public struct FLACContainer: DetailedStringConvertible {
                 }
                 
             case .seekTable:
-                if metadata.seekTable != nil {
-                    throw DecodeError.duplicatedSeekTable
-                } else {
-                    do {
-                        let block = try Metadata.SeekTableBlock(data: raw.data)
-                        metadata.seekTable = block
-                    } catch {
-                        throw DecodeError.cannotDecodeSeekTable(error)
-                    }
+                do {
+                    let block = try Metadata.SeekTableBlock(data: raw.data)
+                    metadata.seekTable = block
+                } catch {
+                    throw DecodeError.cannotDecodeSeekTable(error)
                 }
                 
             case .vorbisComment:
-                if metadata.seekTable != nil {
-                    throw DecodeError.duplicatedVorbisComment
-                } else {
-                    do {
-                        let block = try Metadata.VorbisCommentBlock(data: raw.data)
-                        metadata.vorbisComment = block
-                    } catch {
-                        throw DecodeError.cannotDecodeVorbisComment(error)
-                    }
+                do {
+                    let block = try Metadata.VorbisCommentBlock(data: raw.data)
+                    metadata.vorbisComment = block
+                } catch {
+                    throw DecodeError.cannotDecodeVorbisComment(error)
                 }
                 
             case .cueSheet:
@@ -142,11 +134,8 @@ public struct FLACContainer: DetailedStringConvertible {
         case missingStreamInfo(Error)
         case cannotDecodeApplication(Error)
         case cannotDecodeSeekTable(Error)
-        case duplicatedSeekTable
         case cannotDecodeVorbisComment(Error)
-        case duplicatedVorbisComment
         case cannotDecodeCueSheet(Error)
-        case duplicatedCueSheet
         case cannotDecodePicture(Error)
     }
     
