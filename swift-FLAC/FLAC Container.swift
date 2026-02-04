@@ -93,15 +93,11 @@ public struct FLACContainer: DetailedStringConvertible {
                 }
                 
             case .cueSheet:
-                if metadata.cueSheet != nil {
-                    throw DecodeError.duplicatedCueSheet
-                } else {
-                    do {
-                        let block = try Metadata.CueSheetBlock(data: raw.data)
-                        metadata.cueSheet = block
-                    } catch {
-                        throw DecodeError.cannotDecodeCueSheet(error)
-                    }
+                do {
+                    let block = try Metadata.CueSheetBlock(data: raw.data)
+                    metadata.cueSheet = block
+                } catch {
+                    throw DecodeError.cannotDecodeCueSheet(error)
                 }
                 
             case .picture:
